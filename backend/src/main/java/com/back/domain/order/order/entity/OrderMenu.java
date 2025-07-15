@@ -32,4 +32,5 @@ public class OrderMenu extends BaseEntity {
     // 주문한 메뉴의 수량
     @Column(name = "quantity", nullable = false, columnDefinition = "INT DEFAULT 1")
     private int quantity;
+
 }
