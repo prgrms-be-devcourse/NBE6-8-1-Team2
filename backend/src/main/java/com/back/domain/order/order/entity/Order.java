@@ -36,4 +36,5 @@ public class Order extends BaseEntity {
         orderMenus.add(orderMenu);
         orderMenu.setOrder(this);
     }
+
 }
