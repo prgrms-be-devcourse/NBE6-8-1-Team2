@@ -1,12 +1,13 @@
 package com.back.domain.menu.menu.dto;
 
 import com.back.domain.menu.menu.entity.Menu;
+import jakarta.validation.constraints.*;
 
 public record MenuDto(
-        String name,
+        @NotBlank String name,
         String description,
-        int price,
-        int stock_count
+        @Min(0) int price,
+        @Min(0) int stock_count
 ) {
     public Menu toEntity() {
         return new Menu(name, description, price, stock_count);

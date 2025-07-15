@@ -14,4 +14,9 @@ public class MenuService {
     public Menu addMenu(MenuDto menuDto) {
         return menuRepository.save(menuDto.toEntity());
     }
+    public Menu updateMenu(Integer menuId, MenuDto menuDto) {
+        Menu menu = menuRepository.findById(menuId).orElseThrow(()-> new IllegalArgumentException("해당 메뉴가 존재하지 않습니다. id=" + menuId));
+        menu.update(menuDto);
+        return menu;
+    }
 }

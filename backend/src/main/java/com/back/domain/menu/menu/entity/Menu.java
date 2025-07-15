@@ -1,5 +1,6 @@
 package com.back.domain.menu.menu.entity;
 
+import com.back.domain.menu.menu.dto.MenuDto;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -19,5 +20,12 @@ public class Menu extends BaseEntity {
         this.description = description;
         this.price = price;
         this.stock_count = stock_count;
+    }
+
+    public void update(MenuDto dto){
+        this.name = dto.name();
+        this.description = dto.description();
+        this.price = dto.price();
+        this.stock_count = dto.stock_count();
     }
 }
