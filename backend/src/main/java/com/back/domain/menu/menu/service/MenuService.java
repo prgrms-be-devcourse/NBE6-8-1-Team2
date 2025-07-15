@@ -19,4 +19,9 @@ public class MenuService {
         menu.update(menuDto);
         return menu;
     }
+    public void deleteMenu(Integer menuId) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다. id=" + menuId));
+        menuRepository.delete(menu);
+    }
 }

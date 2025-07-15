@@ -10,12 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/admin/menus")
 @RequiredArgsConstructor
-public class MenuController {
+public class AdmMenuController {
     private final MenuRepository menuRepository;
     private final MenuService menuService;
 
@@ -31,6 +29,11 @@ public class MenuController {
         Menu updatedMenu = menuService.updateMenu(menuId,menuDto);
         return ResponseEntity.ok(updatedMenu);
     }
-
+    @DeleteMapping("/{menuId}")
+    @Transactional
+    public ResponseEntity<Void> deleteMenu(@PathVariable Integer menuId) {
+        menuService.deleteMenu(menuId);
+        return ResponseEntity.noContent().build();
+    }
 
 }

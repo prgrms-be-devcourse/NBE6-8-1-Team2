@@ -14,6 +14,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class MenuControllerTest {
+public class AdmMenuControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -59,7 +61,7 @@ public class MenuControllerTest {
                         .content(requestBody)
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(handler().handlerType(MenuController.class))
+                .andExpect(handler().handlerType(AdmMenuController.class))
                 .andExpect(handler().methodName("addMenu"))
                 .andExpect(jsonPath("$.name").value("Coffee"))
                 .andExpect(jsonPath("$.description").value("Bitter sweet kind coffee"))
@@ -94,5 +96,16 @@ public class MenuControllerTest {
                 .andExpect(jsonPath("$.description").value("초콜릿과 커피가 만난 음료"))
                 .andExpect(jsonPath("$.price").value(4500))
                 .andExpect(jsonPath("$.stock_count").value(60));
+    }
+
+    @DisplayName("메뉴 삭제")
+    @Test
+    @WithMockUser(username = "adminUser", roles = {"ADMIN"})
+    void t3() throws Exception {
+        mockMvc.perform(delete("/admin/menus/{menuId}", savedMenu.getId())
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        assertFalse(menuRepository.findById(savedMenu.getId()).isPresent());
     }
 }
