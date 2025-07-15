@@ -14,17 +14,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class MenuControllerTest {
+public class AdmMenuControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -54,12 +57,12 @@ public class MenuControllerTest {
             }
             """;
 
-        mockMvc.perform(post("/admin/menus")
+        mockMvc.perform(post("/admin/addmenu")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(handler().handlerType(MenuController.class))
+                .andExpect(handler().handlerType(AdmMenuController.class))
                 .andExpect(handler().methodName("addMenu"))
                 .andExpect(jsonPath("$.name").value("Coffee"))
                 .andExpect(jsonPath("$.description").value("Bitter sweet kind coffee"))
@@ -94,5 +97,48 @@ public class MenuControllerTest {
                 .andExpect(jsonPath("$.description").value("초콜릿과 커피가 만난 음료"))
                 .andExpect(jsonPath("$.price").value(4500))
                 .andExpect(jsonPath("$.stock_count").value(60));
+    }
+
+    @DisplayName("메뉴 삭제")
+    @Test
+    @WithMockUser(username = "adminUser", roles = {"ADMIN"})
+    void t3() throws Exception {
+        mockMvc.perform(delete("/admin/menus/{menuId}", savedMenu.getId())
+                        .with(csrf()))
+                .andExpect(status().isNoContent());
+
+        assertFalse(menuRepository.findById(savedMenu.getId()).isPresent());
+    }
+
+    @DisplayName("메뉴 단건 조회")
+    @Test
+    @WithMockUser(username = "adminUser", roles = {"ADMIN"})
+    void t4() throws Exception {
+        mockMvc.perform(get("/admin/menus/{menuId}", savedMenu.getId())
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(savedMenu.getId()))
+                .andExpect(jsonPath("$.name").value(savedMenu.getName()))
+                .andExpect(jsonPath("$.description").value(savedMenu.getDescription()))
+                .andExpect(jsonPath("$.price").value(savedMenu.getPrice()))
+                .andExpect(jsonPath("$.stock_count").value(savedMenu.getStock_count()));
+    }
+
+    @DisplayName("전체 메뉴 조회")
+    @Test
+    @WithMockUser(username = "adminUser", roles = {"ADMIN"})
+    void t5() throws Exception {
+
+        Menu menu2 = new Menu("라떼", "부드러운 우유 커피", 4000, 80);
+        menuRepository.save(menu2);
+
+        mockMvc.perform(get("/admin/menus")
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(savedMenu.getId()))
+                .andExpect(jsonPath("$[0].name").value(savedMenu.getName()))
+                .andExpect(jsonPath("$[1].name").value("라떼"))
+                .andExpect(jsonPath("$[1].stock_count").value(80));
     }
 }
