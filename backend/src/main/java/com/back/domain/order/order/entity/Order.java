@@ -25,7 +25,7 @@ public class Order extends BaseEntity {
 
     // 주문 총 금액
     @Column(name = "total_price")
-    private Long totalPrice;
+    private int totalPrice;
 
     // 주문에 포함된 메뉴 리스트
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
