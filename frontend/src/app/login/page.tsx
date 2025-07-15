@@ -27,7 +27,7 @@ export default function LoginPage() {
 
       localStorage.setItem("accessToken", res.token);
       alert("로그인 성공");
-      router.push("/menus");
+      router.push("/order");
     } catch (err: any) {
       alert(`로그인 실패 : ${err.message}`);
     }
