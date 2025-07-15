@@ -1,5 +1,6 @@
 package com.back.domain.order.order.entity;
 
+import com.back.domain.menu.menu.entity.Menu;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.awt.*;
 
 @Entity
 @Getter
