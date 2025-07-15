@@ -56,7 +56,7 @@ export default function Menus() {
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
-  // 메뉴 등록 API
+  // 메뉴 등록 API 호출
   const handleCreateMenu = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,7 +73,7 @@ export default function Menus() {
 
       alert("메뉴가 등록되었습니다.");
       closeModal(); // 모달 닫기
-      fetchMenus(); // 목록 갱신
+      fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
       console.error(error);
       alert("메뉴를 등록하는 중 오류가 발생했습니다.");
@@ -92,7 +92,10 @@ export default function Menus() {
 
       if (!res.ok) throw new Error("삭제 실패");
 
-      alert("메뉴가 삭제되었습니다.");
+      // 백엔드 응답 메시지를 alert로 그대로 보여주기
+      const result = await res.json();
+      alert(result.message);
+
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
       console.error(error);
@@ -154,7 +157,7 @@ export default function Menus() {
         </tbody>
       </table>
 
-      {/* 모달 UI */}
+      {/* 메뉴 등록 모달 */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow max-w-md w-full">
