@@ -5,11 +5,9 @@ import com.back.domain.order.order.dto.OrderResponseDto;
 import com.back.domain.order.order.serivce.OrderSerivce;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +24,22 @@ public class OrderController {
         return orderSerivce.createOrder(orderRequestDto, user);
     }
 
+    // Get /myorder : 내 주문 목록 조회
+    @GetMapping("/myorder")
+    public List<OrderResponseDto> getMyOrders(
+            @AuthenticationPrincipal User user) {
+        return orderSerivce.getMyOrders(user);
+    }
 
+    // Get /admin/orders : 전체 주문 목록 조회 (관리자)
+    @GetMapping("/admin/orders")
+    public List<OrderResponseDto> getAllOrders(
+            @AuthenticationPrincipal User user) {
+        // 권한
+        if (!user.getRole().equals("ADMIN")) {
+            throw new IllegalStateException("관리자만 접근 가능합니다.");
+        }
+
+        return orderSerivce.getAllOrders();
+    }
 }

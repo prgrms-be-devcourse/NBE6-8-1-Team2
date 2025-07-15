@@ -70,4 +70,52 @@ public class OrderSerivce {
         );
     }
 
+    // 내 주문목록
+    public List<OrderResponseDto> getMyOrders(User user) {
+        List<Order> orders = orderRepository.findByUser(user);
+
+        return orders.stream()
+                .map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+                            .map(om -> new OrderMenuResponseDto(
+                                    om.getMenu().getId(),
+                                    om.getMenu().getName(),
+                                    om.getQuantity(),
+                                    om.getMenu().getPrice()
+                            )).toList();
+
+                    return new OrderResponseDto(
+                            order.getId(),
+                            order.getTotalPrice(),
+                            order.getCreateDate(),
+                            menuResponses
+                    );
+                }).toList();
+    }
+
+
+    // 전체 주문 목록 조회 (관리자)
+    public List<OrderResponseDto> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+
+        return orders.stream()
+                .map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+                            .map(om -> new OrderMenuResponseDto(
+                                    om.getMenu().getId(),
+                                    om.getMenu().getName(),
+                                    om.getQuantity(),
+                                    om.getMenu().getPrice()
+                            )).toList();
+
+                    return new OrderResponseDto(
+                            order.getId(),
+                            order.getTotalPrice(),
+                            order.getCreateDate(),
+                            menuResponses
+                    );
+                }).toList();
+
+    }
+
 }
