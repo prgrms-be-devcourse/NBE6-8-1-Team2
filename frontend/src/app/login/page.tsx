@@ -25,9 +25,9 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
 
-      localStorage.setItem("accessToken", res.token); // 토큰 저장
+      localStorage.setItem("accessToken", res.token);
       alert("로그인 성공");
-      router.push("/menus"); // 메뉴 페이지로 이동
+      router.push("/menus");
     } catch (err: any) {
       alert(`로그인 실패 : ${err.message}`);
     }
