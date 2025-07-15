@@ -1,9 +1,6 @@
 package com.back.domain.order.order.entity;
 
-/*
-
- */
-
+import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,22 +16,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
-    // 주문 고유 id
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+public class Order extends BaseEntity {
     // 주문한 사용자 정보
+    // User구현 후 예정
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 주문 생성일시
-    private LocalDateTime createdAt;
-
     // 주문 총 금액
-    private int totalPrice;
+    @Column(name = "total_price")
+    private Long totalPrice;
 
     // 주문에 포함된 메뉴 리스트
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
