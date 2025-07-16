@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-type Menu = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stockCount: number;
-};
+import { Menu } from "@/types";
 
 export default function Menus() {
   const [menus, setMenus] = useState<Menu[]>([]);

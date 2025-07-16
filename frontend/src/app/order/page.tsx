@@ -3,18 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { useRouter } from "next/navigation";
-
-type MenuItem = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-};
-
-type CartItem = {
-  menu: MenuItem;
-  quantity: number;
-};
+import { MenuItem, CartItem } from "@/types";
 
 export default function OrderPage() {
   const router = useRouter();
