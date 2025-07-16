@@ -1,15 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Menu } from "@/types";
 import { useRouter } from "next/navigation";
-
-type Menu = {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  stockCount: number;
-};
 
 export default function Menus() {
   const router = useRouter();

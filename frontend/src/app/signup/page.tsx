@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch";
+import { SignupForm } from "@/types";
 
 export default function SignupPage() {
     const router = useRouter();
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<SignupForm>({
         email: "",
         password: "",
         nickname: "",

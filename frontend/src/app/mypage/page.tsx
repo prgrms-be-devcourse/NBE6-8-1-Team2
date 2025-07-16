@@ -2,20 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch"; 
-
-type OrderItem = {
-  menuId: number;
-  name: string;
-  quantity: number;
-  price: number;
-};
-
-type Order = {
-  orderId: number;
-  createdAt: string;
-  totalPrice: number;
-  orderItems: OrderItem[];
-};
+import { Order, OrderItem } from "@/types";
 
 export default function MyPage() {
   const [orders, setOrders] = useState<Order[]>([]);
