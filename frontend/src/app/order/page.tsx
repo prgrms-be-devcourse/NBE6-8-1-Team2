@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { MenuItem, CartItem } from "@/types";
 import { useOrder } from "@/hooks/useOrder";
+import { MenuCard } from "@/components/order/MenuCard";
 import { CartItemCard } from "@/components/order/CartItemCard";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export default function OrderPage() {
   const [menus, setMenus] = useState<MenuItem[]>([]);
@@ -41,25 +43,14 @@ export default function OrderPage() {
       <h1 className="text-xl font-bold mb-4">메뉴</h1>
 
       <div className="space-y-4">
-        {menus.map((menu) => (
-          <div
-            key={menu.id}
-            className="border p-4 rounded shadow-sm flex justify-between items-center"
-          >
-            <div>
-              <p className="font-semibold">{menu.name}</p>
-              <p className="text-sm text-gray-500">{menu.description}</p>
-              <p className="text-sm">₩{menu.price.toLocaleString()}</p>
-            </div>
-            <button
-              onClick={() => handleAddToCart(menu)}
-              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-            >
-              담기
-            </button>
-          </div>
-        ))}
-      </div>
+      {menus.map((menu) => (
+        <MenuCard
+          key={menu.id}
+          menu={menu}
+          onAdd={() => handleAddToCart(menu)}
+        />
+      ))}
+    </div>
 
       <h2 className="text-lg font-bold mt-8">장바구니</h2>
 
@@ -117,9 +108,7 @@ export default function OrderPage() {
         {isLoading ? "결제 처리 중..." : "결제하기"}
       </button>
 
-      {errorMessage && (
-        <p className="text-red-500 mt-2 text-sm">{errorMessage}</p>
-      )}
+      <ErrorMessage message={errorMessage} />
     </div>
   );
 }

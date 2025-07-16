@@ -6,6 +6,7 @@ import { useSignup } from "@/hooks/useSignup";
 import { SignupForm } from "@/types";
 import { InputField } from "@/components/ui/InputField";
 import { Button } from "@/components/ui/Button";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function SignupPage() {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">회원가입</h1>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      <ErrorMessage message={errorMessage} />
 
       <form onSubmit={handleSubmit}>
         <InputField name="email" type="email" placeholder="이메일" value={form.email} onChange={handleChange} />

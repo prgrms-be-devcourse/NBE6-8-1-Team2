@@ -5,6 +5,7 @@ import { useLogin } from "@/hooks/useLogin";
 import { LoginForm } from "@/types";
 import { InputField } from "@/components/ui/InputField";
 import { Button } from "@/components/ui/Button";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export default function LoginPage() {
   const { login, isLoading, errorMessage } = useLogin();
@@ -22,7 +23,7 @@ export default function LoginPage() {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">로그인</h1>
-      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      <ErrorMessage message={errorMessage} />
 
       <form onSubmit={handleSubmit}>
         <InputField
