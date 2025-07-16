@@ -1,0 +1,140 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+type Props = {
+  params: { id: string };
+};
+
+export default function EditMenu({ params }: Props) {
+  const menuId = params.id;
+  const router = useRouter();
+
+  // 기존 메뉴 정보를 상태로 관리
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState<number>(0);
+  const [stockCount, setStockCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  // 메뉴 상세 조회 → 기존 데이터 불러오기
+  const fetchMenu = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/admin/menus/${menuId}`);
+      if (!res.ok) throw new Error("메뉴 불러오기 실패");
+
+      const data = await res.json();
+
+      setName(data.name);
+      setDescription(data.description);
+      setPrice(data.price);
+      setStockCount(data.stock_count);
+    } catch (error) {
+      console.error(error);
+      alert("메뉴 정보를 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMenu();
+  }, [menuId]);
+
+  // 수정 버튼 클릭 → PUT API 호출
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const updatedMenu = {
+      name,
+      description,
+      price,
+      stock_count: stockCount,
+    };
+
+    try {
+      const res = await fetch(`http://localhost:8080/admin/menus/${menuId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedMenu),
+      });
+
+      if (!res.ok) throw new Error("메뉴 수정 실패");
+
+      // 수정된 메뉴 응답 받기
+      const updated = await res.json();
+      console.log("수정된 메뉴:", updated);
+
+      alert(
+        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${updated.name}\n- 설명: ${updated.description}\n- 가격: ${updated.price}원\n- 재고: ${updated.stock_count}개`
+      );
+
+      router.push("/admin/menus"); // 수정 후 목록으로 이동
+    } catch (error) {
+      console.error(error);
+      alert("메뉴를 수정하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  if (loading) return <p>로딩 중입니다...</p>;
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-4">메뉴 수정</h1>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <div>
+          <label className="block font-semibold">메뉴 이름</label>
+          <input
+            type="text"
+            className="w-full border p-2 rounded"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="메뉴 이름을 입력하세요"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold">설명</label>
+          <textarea
+            className="w-full border p-2 rounded"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="메뉴 설명을 입력하세요"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold">가격</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded"
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            placeholder="가격을 입력하세요"
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold">재고</label>
+          <input
+            type="number"
+            className="w-full border p-2 rounded"
+            value={stockCount}
+            onChange={(e) => setStockCount(Number(e.target.value))}
+            placeholder="재고 수량을 입력하세요"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          수정하기
+        </button>
+      </form>
+    </div>
+  );
+}
