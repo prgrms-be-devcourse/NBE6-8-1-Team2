@@ -31,7 +31,7 @@ public class OrderController {
             // @AuthenticationPrincipal User user   // 추후 수정 예정 부분
             ) {
         Member member = memberRepository.findById((memberId))    // 추후 수정 예정 부분
-                .orElseThrow(() -> new RuntimeException("user not found"));
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
 
         return orderService.createOrder(orderRequestDto);
     }
@@ -44,7 +44,7 @@ public class OrderController {
             // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("user not found"));
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
 
         return orderService.getMyOrders(member);
     }
