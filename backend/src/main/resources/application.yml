@@ -2,11 +2,19 @@ spring:
   application:
     name: back
   profiles:
-    active: dev
+    active: test
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
+
     properties:
       hibernate:
         format_sql: true

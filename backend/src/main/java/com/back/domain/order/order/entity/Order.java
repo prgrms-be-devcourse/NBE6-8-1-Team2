@@ -1,5 +1,6 @@
 package com.back.domain.order.order.entity;
 
+import com.back.domain.member.member.entity.Member;
 import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +16,14 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "`order`")
 public class Order extends BaseEntity {
-    // 주문한 사용자 정보
-    // User구현 후 예정
+    /*
+    Member관련 구현 후 예정
+     */
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private Member member;
 
     // 주문 총 금액
     @Column(name = "total_price")

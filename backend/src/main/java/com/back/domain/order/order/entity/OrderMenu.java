@@ -2,10 +2,7 @@ package com.back.domain.order.order.entity;
 
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.global.jpa.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "order_menu")
 public class OrderMenu extends BaseEntity {
     // 이 주문 메뉴가 속한 주문
     @ManyToOne
