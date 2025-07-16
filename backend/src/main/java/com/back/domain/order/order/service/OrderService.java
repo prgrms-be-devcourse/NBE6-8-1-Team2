@@ -1,5 +1,6 @@
 package com.back.domain.order.order.service;
 
+import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
@@ -9,9 +10,7 @@ import com.back.domain.order.order.dto.OrderRequestDto;
 import com.back.domain.order.order.dto.OrderResponseDto;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
-import com.back.domain.order.order.repository.OrderMenuRepository;
 import com.back.domain.order.order.repository.OrderRepository;
-import com.back.domain.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final OrderMenuRepository orderMenuRepository;
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
 
@@ -72,6 +70,22 @@ public class OrderService {
         );
     }
 
+    // 주문 삭제
+    public void deleteOrder(int orderId, Member member) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        boolean isOwner = order.getMember().getId() == (member.getId());
+        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+
+        if(!isOwner && !isAdmin) {
+            throw new IllegalStateException("주문 삭제는 본인 또는 관리자만 가능합니다.");
+        }
+
+        orderRepository.delete(order);
+    }
+
+
     // 내 주문목록
     public List<OrderResponseDto> getMyOrders(Member member) {
         List<Order> orders = orderRepository.findByMember(member);
@@ -94,6 +108,29 @@ public class OrderService {
                     );
                 }).toList();
     }
+
+    // 주문 상세 조회
+    public OrderResponseDto getOrderDetailById(int orderId, Member member) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        boolean isOwner = order.getMember().getId() == member.getId();
+        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
+        }
+
+        List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+                .map(om -> new OrderMenuResponseDto(
+                        om.getMenu().getId(),
+                        om.getMenu().getName(),
+                        om.getQuantity(),
+                        om.getMenu().getPrice()
+                )).toList();
+
+        return new OrderResponseDto(order.getId(), order.getTotalPrice(), order.getCreateDate(), menuResponses);
+    }
+
 
 
     // 전체 주문 목록 조회 (관리자)
