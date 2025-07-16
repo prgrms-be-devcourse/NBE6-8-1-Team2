@@ -12,6 +12,7 @@ export default function LoginPage() {
     password: "",
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // 에러 메시지 상태 추가
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,6 +21,7 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return; // 중복 요청 방지
     setErrorMessage(""); // 폼 제출 시 에러 메시지 초기화
 
     // 이메일 유효성 검사
@@ -35,6 +37,7 @@ export default function LoginPage() {
       return;
     }
 
+    setIsLoading(true);
     try {
       const res = await apiFetch<{ token: string }>("/api/login", {
         method: "POST",
@@ -46,6 +49,8 @@ export default function LoginPage() {
       router.push("/order");
     } catch (err: any) {
       alert(`로그인 실패 : ${err.message}`);
+    } finally {
+      setIsLoading(false); // 요청 완료 후 로딩 상태 해제
     }
   };
 

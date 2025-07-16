@@ -21,6 +21,7 @@ export default function OrderPage() {
 
   const [menus, setMenus] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false); 
 
   /*
   // 테스트용 메뉴 목록
@@ -77,6 +78,9 @@ export default function OrderPage() {
       menuId: item.menu.id,
       quantity: item.quantity,
     }));
+
+    if (isLoading) return;
+    setIsLoading(true);
   
     try {
       await apiFetch("/api/orders", {
@@ -89,6 +93,8 @@ export default function OrderPage() {
       router.push("/mypage");
     } catch (err: any) {
       alert(`주문 실패 : ${err.message}`);
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -195,9 +201,10 @@ export default function OrderPage() {
       <button
         type="button"
         onClick={handleOrder}
+        disabled={isLoading}
         className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
       >
-        결제하기
+        {isLoading ? "결제 처리 중..." : "결제하기"} {/* 로딩 중이면 텍스트 변경 */}
       </button>
     </div>
   );
