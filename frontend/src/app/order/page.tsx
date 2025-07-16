@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { MenuItem, CartItem } from "@/types";
 import { useOrder } from "@/hooks/useOrder";
@@ -13,13 +13,35 @@ export default function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const { order, isLoading, errorMessage } = useOrder();
 
+  /*
+  // 테스트용 메뉴 목록
+  useEffect(() => {
+    const mockMenus: MenuItem[] = [
+      {
+        id: 1,
+        name: "아메리카노",
+        description: "시원한 아이스 아메리카노",
+        price: 3000,
+      },
+      {
+        id: 2,
+        name: "카페라떼",
+        description: "부드러운 우유 거품의 라떼",
+        price: 4000,
+      },
+    ];
+
+    setMenus(mockMenus);
+  }, []);
+  */
+
   useEffect(() => {
     apiFetch<MenuItem[]>("/api/menus")
       .then(setMenus)
       .catch((err) => alert("메뉴 불러오기 실패: " + err.message));
   }, []);
 
-  const handleAddToCart = (menu: MenuItem) => {
+  const handleAddToCart = useCallback((menu: MenuItem) => {
     setCart((prev) => {
       const existing = prev.find((item) => item.menu.id === menu.id);
       if (existing) {
@@ -32,7 +54,31 @@ export default function OrderPage() {
         return [...prev, { menu, quantity: 1 }];
       }
     });
-  };
+  }, []);
+
+  const handleIncrease = useCallback((id: number) => {
+    setCart((prev) =>
+      prev.map((item) =>
+        item.menu.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  }, []);
+
+  const handleDecrease = useCallback((id: number) => {
+    setCart((prev) =>
+      prev
+        .map((item) =>
+          item.menu.id === id
+            ? { ...item, quantity: Math.max(0, item.quantity - 1) }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
+    );
+  }, []);
+
+  const handleRemove = useCallback((id: number) => {
+    setCart((prev) => prev.filter((item) => item.menu.id !== id));
+  }, []);
 
   const handleOrder = () => {
     order(cart);
@@ -43,14 +89,10 @@ export default function OrderPage() {
       <h1 className="text-xl font-bold mb-4">메뉴</h1>
 
       <div className="space-y-4">
-      {menus.map((menu) => (
-        <MenuCard
-          key={menu.id}
-          menu={menu}
-          onAdd={() => handleAddToCart(menu)}
-        />
-      ))}
-    </div>
+        {menus.map((menu) => (
+          <MenuCard key={menu.id} menu={menu} onAdd={() => handleAddToCart(menu)} />
+        ))}
+      </div>
 
       <h2 className="text-lg font-bold mt-8">장바구니</h2>
 
@@ -62,31 +104,9 @@ export default function OrderPage() {
             <CartItemCard
               key={item.menu.id}
               item={item}
-              onIncrease={() =>
-                setCart((prev) =>
-                  prev.map((c) =>
-                    c.menu.id === item.menu.id
-                      ? { ...c, quantity: c.quantity + 1 }
-                      : c
-                  )
-                )
-              }
-              onDecrease={() =>
-                setCart((prev) =>
-                  prev
-                    .map((c) =>
-                      c.menu.id === item.menu.id
-                        ? { ...c, quantity: Math.max(0, c.quantity - 1) }
-                        : c
-                    )
-                    .filter((c) => c.quantity > 0)
-                )
-              }
-              onRemove={() =>
-                setCart((prev) =>
-                  prev.filter((c) => c.menu.id !== item.menu.id)
-                )
-              }
+              onIncrease={() => handleIncrease(item.menu.id)}
+              onDecrease={() => handleDecrease(item.menu.id)}
+              onRemove={() => handleRemove(item.menu.id)}
             />
           ))}
         </div>
