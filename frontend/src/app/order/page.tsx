@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { MenuItem, CartItem } from "@/types";
 import { useOrder } from "@/hooks/useOrder";
+import { CartItemCard } from "@/components/order/CartItemCard";
 
 export default function OrderPage() {
   const [menus, setMenus] = useState<MenuItem[]>([]);
@@ -21,7 +22,9 @@ export default function OrderPage() {
       const existing = prev.find((item) => item.menu.id === menu.id);
       if (existing) {
         return prev.map((item) =>
-          item.menu.id === menu.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.menu.id === menu.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       } else {
         return [...prev, { menu, quantity: 1 }];
@@ -39,7 +42,10 @@ export default function OrderPage() {
 
       <div className="space-y-4">
         {menus.map((menu) => (
-          <div key={menu.id} className="border p-4 rounded shadow-sm flex justify-between items-center">
+          <div
+            key={menu.id}
+            className="border p-4 rounded shadow-sm flex justify-between items-center"
+          >
             <div>
               <p className="font-semibold">{menu.name}</p>
               <p className="text-sm text-gray-500">{menu.description}</p>
@@ -62,56 +68,35 @@ export default function OrderPage() {
       ) : (
         <div className="space-y-2 mt-4">
           {cart.map((item) => (
-            <div key={item.menu.id} className="border p-3 flex justify-between items-center rounded">
-              <div>
-                <p className="font-semibold">{item.menu.name}</p>
-                <p className="text-sm text-gray-500">
-                  ₩{item.menu.price.toLocaleString()}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCart((prev) =>
-                      prev.map((c) =>
-                        c.menu.id === item.menu.id
-                          ? { ...c, quantity: Math.max(0, c.quantity - 1) }
-                          : c
-                      ).filter((c) => c.quantity > 0)
+            <CartItemCard
+              key={item.menu.id}
+              item={item}
+              onIncrease={() =>
+                setCart((prev) =>
+                  prev.map((c) =>
+                    c.menu.id === item.menu.id
+                      ? { ...c, quantity: c.quantity + 1 }
+                      : c
+                  )
+                )
+              }
+              onDecrease={() =>
+                setCart((prev) =>
+                  prev
+                    .map((c) =>
+                      c.menu.id === item.menu.id
+                        ? { ...c, quantity: Math.max(0, c.quantity - 1) }
+                        : c
                     )
-                  }
-                  className="px-2 py-1 bg-gray-300 rounded"
-                >
-                  -
-                </button>
-                <span>{item.quantity}</span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCart((prev) =>
-                      prev.map((c) =>
-                        c.menu.id === item.menu.id ? { ...c, quantity: c.quantity + 1 } : c
-                      )
-                    )
-                  }
-                  className="px-2 py-1 bg-gray-300 rounded"
-                >
-                  +
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    setCart((prev) =>
-                      prev.filter((c) => c.menu.id !== item.menu.id)
-                    )
-                  }
-                  className="px-2 py-1 bg-red-400 text-white rounded"
-                >
-                  삭제
-                </button>
-              </div>
-            </div>
+                    .filter((c) => c.quantity > 0)
+                )
+              }
+              onRemove={() =>
+                setCart((prev) =>
+                  prev.filter((c) => c.menu.id !== item.menu.id)
+                )
+              }
+            />
           ))}
         </div>
       )}
@@ -131,6 +116,10 @@ export default function OrderPage() {
       >
         {isLoading ? "결제 처리 중..." : "결제하기"}
       </button>
+
+      {errorMessage && (
+        <p className="text-red-500 mt-2 text-sm">{errorMessage}</p>
+      )}
     </div>
   );
 }
