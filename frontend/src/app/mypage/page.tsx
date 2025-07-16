@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch"; 
-import { Order, OrderItem } from "@/types";
+import { Order } from "@/types";
+import { OrderCard } from "@/components/mypage/OrderCard";
 
 export default function MyPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -60,27 +61,7 @@ export default function MyPage() {
       ) : (
         <ul className="space-y-6">
           {orders.map((order) => (
-            <li
-              key={order.orderId}
-              className="border p-4 rounded-xl shadow bg-white"
-            >
-              <p className="text-sm text-gray-500 mb-2">
-                주문 일시: {new Date(order.createdAt).toLocaleString()}
-              </p>
-              <ul className="divide-y">
-                {order.orderItems.map((item, index) => (
-                  <li key={index} className="flex justify-between py-1">
-                    <span>
-                      {item.name} x {item.quantity}
-                    </span>
-                    <span>{item.price * item.quantity}원</span>
-                  </li>
-                ))}
-              </ul>
-              <p className="text-right mt-2 font-semibold">
-                총 결제 금액: {order.totalPrice.toLocaleString()}원
-              </p>
-            </li>
+            <OrderCard key={order.orderId} order={order} />
           ))}
         </ul>
       )}

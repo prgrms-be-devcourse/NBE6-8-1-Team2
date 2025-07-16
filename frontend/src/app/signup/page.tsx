@@ -2,76 +2,47 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/apiFetch";
+import { useSignup } from "@/hooks/useSignup";
 import { SignupForm } from "@/types";
+import { InputField } from "@/components/ui/InputField";
+import { Button } from "@/components/ui/Button";
+import { ErrorMessage } from "@/components/ui/ErrorMessage";
 
 export default function SignupPage() {
-    const router = useRouter();
+  const router = useRouter();
+  const { signup, isLoading, errorMessage } = useSignup();
+  const [form, setForm] = useState<SignupForm>({
+    email: "",
+    password: "",
+    nickname: "",
+    address: "",
+  });
 
-    const [form, setForm] = useState<SignupForm>({
-        email: "",
-        password: "",
-        nickname: "",
-        address: ""
-        // role은 backend에서 처리
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setForm({ ...form, [e.target.name]: e.target.value });
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await signup(form);
+    if (!isLoading && !errorMessage) router.push("/login");
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-  
-      try {
-        await apiFetch("/api/signup", {
-          method: "POST",
-          body: JSON.stringify(form),
-        });
-  
-        alert("회원가입 성공");
-        router.push("/login");
-      } catch (err: any) {
-        alert(`회원가입 실패 : ${err.message}`);
-      }
-    };
-  
-    return (
-      <div>
-        <h1>회원가입</h1>
-        <form onSubmit={handleSubmit}>
-          <input
-            name="email"
-            type="email"
-            placeholder="이메일"
-            value={form.email}
-            onChange={handleChange}
-            required
-          /><br />
-          <input
-            name="password"
-            type="password"
-            placeholder="비밀번호"
-            value={form.password}
-            onChange={handleChange}
-            required
-          /><br />
-          <input
-            name="nickname"
-            placeholder="닉네임"
-            value={form.nickname}
-            onChange={handleChange}
-            required
-          /><br />
-          <input
-            name="address"
-            placeholder="주소"
-            value={form.address}
-            onChange={handleChange}
-            required
-          /><br />
-          <button type="submit" className="mt-4 px-4 py-2 bg-gray-500 text-white">회원가입</button>
-        </form>
-      </div>
-    );
-  }
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold mb-4">회원가입</h1>
+      <ErrorMessage message={errorMessage} />
+
+      <form onSubmit={handleSubmit}>
+        <InputField name="email" type="email" placeholder="이메일" value={form.email} onChange={handleChange} />
+        <InputField name="password" type="password" placeholder="비밀번호" value={form.password} onChange={handleChange} />
+        <InputField name="nickname" type="text" placeholder="닉네임" value={form.nickname} onChange={handleChange} />
+        <InputField name="address" type="text" placeholder="주소" value={form.address} onChange={handleChange} />
+
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "회원가입 중..." : "회원가입"}
+        </Button>
+      </form>
+    </div>
+  );
+}
