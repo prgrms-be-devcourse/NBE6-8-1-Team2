@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Menu = {
   id: number;
@@ -11,6 +12,8 @@ type Menu = {
 };
 
 export default function Menus() {
+  const router = useRouter();
+
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -80,7 +83,12 @@ export default function Menus() {
     }
   };
 
-  // 삭제 버튼 → 확인 후 API 호출
+  // 수정 버튼 → 수정 페이지 이동
+  const handleEdit = (id: number) => {
+    router.push(`/admin/menus/${id}`); 
+  };
+
+  // 삭제 버튼 → 확인하고 API 호출 후 응답 메시지 출력
   const handleDelete = async (id: number) => {
     const confirmed = confirm("정말 이 메뉴를 삭제하시겠습니까?");
     if (!confirmed) return;
@@ -95,7 +103,7 @@ export default function Menus() {
       // 백엔드 응답 메시지를 alert로 그대로 보여주기
       const result = await res.json();
       alert(result.message);
-
+      
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
       console.error(error);
@@ -139,12 +147,14 @@ export default function Menus() {
               </td>
               <td className="border p-2 text-center">{menu.stockCount}</td>
               <td className="border p-2 text-center space-x-2">
+                {/* 수정 페이지로 이동 */}
                 <button
                   className="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500"
-                  onClick={() => alert("수정 페이지는 별도 구현 필요")}
+                  onClick={() => handleEdit(menu.id)}
                 >
                   수정
                 </button>
+                {/* 삭제 버튼 */}
                 <button
                   onClick={() => handleDelete(menu.id)}
                   className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
