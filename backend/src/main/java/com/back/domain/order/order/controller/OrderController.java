@@ -6,6 +6,7 @@ import com.back.domain.order.order.service.OrderService;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 // import org.springframework.security.core.annotation.AuthenticationPrincipal; 시큐리티 보류
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
+@Tag(name = "OrderAPI", description = "관리자 및 사용자가 사용하는 주문 CRUD API")
 public class OrderController {
 
     private final OrderService orderService;
