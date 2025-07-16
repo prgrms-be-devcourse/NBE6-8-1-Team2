@@ -2,16 +2,15 @@ spring:
   application:
     name: back
   profiles:
-    active: test
+    active: dev
 
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     properties:
       hibernate:
         format_sql: true
         highlight_sql: true
         use_sql_comments: true
-e-initialization: true

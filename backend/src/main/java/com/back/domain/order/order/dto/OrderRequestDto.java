@@ -12,5 +12,5 @@ public class OrderRequestDto {
 
     @Getter
     @Setter
-    private int memberId; // !!!Security 적용 전 임시 사용!!!
+    private int memberId; // !!!인증인가 적용 전 임시 사용!!!
 }
