@@ -64,10 +64,10 @@ public class AdmMenuControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(handler().handlerType(AdmMenuController.class))
                 .andExpect(handler().methodName("addMenu"))
-                .andExpect(jsonPath("$.name").value("Coffee"))
-                .andExpect(jsonPath("$.description").value("Bitter sweet kind coffee"))
-                .andExpect(jsonPath("$.price").value(12000))
-                .andExpect(jsonPath("$.stock_count").value(75));
+                .andExpect(jsonPath("$.data.name").value("Coffee"))
+                .andExpect(jsonPath("$.data.description").value("Bitter sweet kind coffee"))
+                .andExpect(jsonPath("$.data.price").value(12000))
+                .andExpect(jsonPath("$.data.stock_count").value(75));
 
         // 데이터베이스에 메뉴가 실제로 저장되었는지 확인
         assertThat(menuRepository.count()).isEqualTo(2);
@@ -93,10 +93,10 @@ public class AdmMenuControllerTest {
                         .content(json)
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("카페모카"))
-                .andExpect(jsonPath("$.description").value("초콜릿과 커피가 만난 음료"))
-                .andExpect(jsonPath("$.price").value(4500))
-                .andExpect(jsonPath("$.stock_count").value(60));
+                .andExpect(jsonPath("$.data.name").value("카페모카"))
+                .andExpect(jsonPath("$.data.description").value("초콜릿과 커피가 만난 음료"))
+                .andExpect(jsonPath("$.data.price").value(4500))
+                .andExpect(jsonPath("$.data.stock_count").value(60));
     }
 
     @DisplayName("메뉴 삭제")
@@ -105,7 +105,7 @@ public class AdmMenuControllerTest {
     void t3() throws Exception {
         mockMvc.perform(delete("/admin/menus/{menuId}", savedMenu.getId())
                         .with(csrf()))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         assertFalse(menuRepository.findById(savedMenu.getId()).isPresent());
     }
@@ -117,11 +117,11 @@ public class AdmMenuControllerTest {
         mockMvc.perform(get("/admin/menus/{menuId}", savedMenu.getId())
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(savedMenu.getId()))
-                .andExpect(jsonPath("$.name").value(savedMenu.getName()))
-                .andExpect(jsonPath("$.description").value(savedMenu.getDescription()))
-                .andExpect(jsonPath("$.price").value(savedMenu.getPrice()))
-                .andExpect(jsonPath("$.stock_count").value(savedMenu.getStock_count()));
+                .andExpect(jsonPath("$.data.id").value(savedMenu.getId()))
+                .andExpect(jsonPath("$.data.name").value(savedMenu.getName()))
+                .andExpect(jsonPath("$.data.description").value(savedMenu.getDescription()))
+                .andExpect(jsonPath("$.data.price").value(savedMenu.getPrice()))
+                .andExpect(jsonPath("$.data.stock_count").value(savedMenu.getStock_count()));
     }
 
     @DisplayName("전체 메뉴 조회")
@@ -135,10 +135,10 @@ public class AdmMenuControllerTest {
         mockMvc.perform(get("/admin/menus")
                         .with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].id").value(savedMenu.getId()))
-                .andExpect(jsonPath("$[0].name").value(savedMenu.getName()))
-                .andExpect(jsonPath("$[1].name").value("라떼"))
-                .andExpect(jsonPath("$[1].stock_count").value(80));
+                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data[0].id").value(savedMenu.getId()))
+                .andExpect(jsonPath("$.data[0].name").value(savedMenu.getName()))
+                .andExpect(jsonPath("$.data[1].name").value("라떼"))
+                .andExpect(jsonPath("$.data[1].stock_count").value(80));
     }
 }
