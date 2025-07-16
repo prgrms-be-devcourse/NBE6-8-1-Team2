@@ -1,18 +1,21 @@
 "use client";
 
 import { CartItem } from "@/types";
+import { memo } from "react";
 
-export function CartItemCard({
-  item,
-  onIncrease,
-  onDecrease,
-  onRemove,
-}: {
+type Props = {
   item: CartItem;
   onIncrease: () => void;
   onDecrease: () => void;
   onRemove: () => void;
-}) {
+};
+
+export const CartItemCard = memo(function CartItemCard({
+  item,
+  onIncrease,
+  onDecrease,
+  onRemove,
+}: Props) {
   return (
     <div className="border p-3 flex justify-between items-center rounded">
       <div>
@@ -29,4 +32,4 @@ export function CartItemCard({
       </div>
     </div>
   );
-}
+});
