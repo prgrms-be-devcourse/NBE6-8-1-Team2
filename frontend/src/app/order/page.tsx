@@ -85,6 +85,7 @@ export default function OrderPage() {
       });
   
       alert("주문이 완료되었습니다.");
+      setCart([]); // 주문 후 장바구니 초기화
       router.push("/mypage");
     } catch (err: any) {
       alert(`주문 실패 : ${err.message}`);
