@@ -1,5 +1,6 @@
 package com.back.domain.order.order.serivce;
 
+import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
 import com.back.domain.order.order.dto.OrderMenuDto;
@@ -10,11 +11,11 @@ import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderMenuRepository;
 import com.back.domain.order.order.repository.OrderRepository;
+import com.back.domain.member.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,12 +27,12 @@ public class OrderSerivce {
     private final MenuRepository menuRepository;
 
     // 주문 등록
-    public OrderResponseDto createOrder(OrderRequestDto requestDto, User user) {
+    public OrderResponseDto createOrder(OrderRequestDto requestDto, Member member) {
+
         // 주문생성
         Order order = new Order();
-        order.setUser(user);
+        order.setMember(member);
         order.setTotalPrice(0); // 총 금액 0원 시작
-        List<OrderMenu> ordermenus = new ArrayList<>();
 
         int totalPrice = 0;
 
@@ -54,7 +55,7 @@ public class OrderSerivce {
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order저장
 
-        List<OrderMenuResponseDto> responseMenus = ordermenus.stream()
+        List<OrderMenuResponseDto> responseMenus = order.getOrderMenus().stream()
                 .map(om -> new OrderMenuResponseDto(
                         om.getMenu().getId(),
                         om.getMenu().getName(),
@@ -71,8 +72,8 @@ public class OrderSerivce {
     }
 
     // 내 주문목록
-    public List<OrderResponseDto> getMyOrders(User user) {
-        List<Order> orders = orderRepository.findByUser(user);
+    public List<OrderResponseDto> getMyOrders(Member member) {
+        List<Order> orders = orderRepository.findByMember(member);
 
         return orders.stream()
                 .map(order -> {
@@ -118,4 +119,5 @@ public class OrderSerivce {
 
     }
 
+    private final MemberRepository memberRepository;
 }
