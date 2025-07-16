@@ -1,4 +1,4 @@
-package com.back.domain.order.order.serivce;
+package com.back.domain.order.order.service;
 
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
@@ -21,19 +21,20 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class OrderSerivce {
+public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMenuRepository orderMenuRepository;
     private final MenuRepository menuRepository;
+    private final MemberRepository memberRepository;
 
     // 주문 등록
-    public OrderResponseDto createOrder(OrderRequestDto requestDto, Member member) {
+    public OrderResponseDto createOrder(OrderRequestDto requestDto) {
+        Member member = memberRepository.findById(requestDto.getMemberId())
+                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
 
         // 주문생성
         Order order = new Order();
         order.setMember(member);
-        order.setTotalPrice(0); // 총 금액 0원 시작
-
         int totalPrice = 0;
 
         for(OrderMenuDto menuDto : requestDto.getOrderMenus()) {
@@ -118,6 +119,4 @@ public class OrderSerivce {
                 }).toList();
 
     }
-
-    private final MemberRepository memberRepository;
 }

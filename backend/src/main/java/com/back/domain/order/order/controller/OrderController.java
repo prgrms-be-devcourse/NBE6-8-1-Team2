@@ -2,7 +2,7 @@ package com.back.domain.order.order.controller;
 
 import com.back.domain.order.order.dto.OrderRequestDto;
 import com.back.domain.order.order.dto.OrderResponseDto;
-import com.back.domain.order.order.serivce.OrderSerivce;
+import com.back.domain.order.order.service.OrderService;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping
 public class OrderController {
 
-    private final OrderSerivce orderSerivce;
+    private final OrderService orderService;
 
     /*
         Security 인증 적용 전, Member관련 PR 적용시 수정할것!
@@ -30,7 +30,7 @@ public class OrderController {
         Member member = memberRepository.findById(orderRequestDto.getMemberId())    // 추후 수정 예정 부분
                 .orElseThrow(() -> new RuntimeException("user not found"));
 
-        return orderSerivce.createOrder(orderRequestDto, member);
+        return orderService.createOrder(orderRequestDto);
     }
 
 
@@ -42,7 +42,7 @@ public class OrderController {
     public List<OrderResponseDto> getMyOrders(Member member // 추후 수정 예정
             // @AuthenticationPrincipal User user
     ) {
-        return orderSerivce.getMyOrders(member);
+        return orderService.getMyOrders(member);
     }
 
 
@@ -59,7 +59,7 @@ public class OrderController {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
 
-        return orderSerivce.getAllOrders();
+        return orderService.getAllOrders();
     }
 
     private final MemberRepository memberRepository;
