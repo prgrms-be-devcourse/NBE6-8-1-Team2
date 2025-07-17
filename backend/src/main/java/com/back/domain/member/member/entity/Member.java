@@ -16,18 +16,9 @@ public class Member extends BaseEntity{
     private String password;
     private String address;
 
-    public enum Role {
-        USER, // 일반 사용자
-        ADMIN // 관리자
-    }
+    // 기존 Role 중복 삭제(태열님 코드로 교체)
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
-
-    public Member(String email, String password) {
-        this.email = email;
-        this.password = password;
-        this.role = Role.USER;
-    }
 
     // 관리자 생성 임시 메서드입니다.(추후 삭제 예정)
     public Member(String email, String password, Role role) {
@@ -41,10 +32,5 @@ public class Member extends BaseEntity{
         this.password = password;
         this.nickname = nickname;
         this.address = address;
-    }
-
-
-    public String getNickname() {
-        return nickname;
     }
 }

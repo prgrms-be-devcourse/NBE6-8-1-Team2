@@ -1,6 +1,7 @@
 package com.back.global.initData;
 
 import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.entity.Role;
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
@@ -32,16 +33,16 @@ public class OrderInitData {
 
 
         // 2. 사용자 등록
-        Member user = new Member("admin1@example.com", "1234", Member.Role.ADMIN);
+        Member user = new Member("admin1@example.com", "1234", Role.ADMIN);
         memberRepository.save(user);
 
-        user = new Member("user1@example.com", "1234");
+        user = new Member("user1@example.com", "1234", "user1", "서울시 강남구");
         memberRepository.save(user);
 
-        user = new Member("user2@example.com", "1234");
+        user = new Member("user2@example.com", "1234", "user2", "서울시 마포구");
         memberRepository.save(user);
 
-        user = new Member("user3@example.com", "1234");
+        user = new Member("user3@example.com", "1234", "user3", "서울시 성동구");
         memberRepository.save(user);
 
         // 3. 주문 등록

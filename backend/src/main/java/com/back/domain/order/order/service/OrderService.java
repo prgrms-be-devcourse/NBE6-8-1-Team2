@@ -1,6 +1,7 @@
 package com.back.domain.order.order.service;
 
 import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.entity.Role;
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
@@ -75,7 +76,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
 
         boolean isOwner = order.getMember().getId() == (member.getId());
-        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+        boolean isAdmin = member.getRole() == Role.ADMIN;
 
         if(!isOwner && !isAdmin) {
             throw new IllegalStateException("주문 삭제는 본인 또는 관리자만 가능합니다.");
@@ -114,7 +115,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
 
         boolean isOwner = order.getMember().getId() == member.getId();
-        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+        boolean isAdmin = member.getRole() == Role.ADMIN;
         if (!isOwner && !isAdmin) {
             throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
         }
