@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin } from "@/hooks/useLogin";
+import { useLogin } from "@/_hooks/useLogin";
 import { LoginForm } from "@/types";
-import { InputField } from "@/components/ui/InputField";
-import { Button } from "@/components/ui/Button";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { InputField } from "@/_components/ui/InputField";
+import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function LoginPage() {
   const { login, isLoading, errorMessage } = useLogin();
@@ -21,29 +20,39 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">로그인</h1>
-      <ErrorMessage message={errorMessage} />
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-full max-w-sm p-8">
+        <h1 className="text-2xl font-bold text-center mb-6">LogIn</h1>
 
-      <form onSubmit={handleSubmit}>
-        <InputField
-          name="email"
-          type="email"
-          placeholder="이메일"
-          value={form.email}
-          onChange={handleChange}
-        />
-        <InputField
-          name="password"
-          type="password"
-          placeholder="비밀번호"
-          value={form.password}
-          onChange={handleChange}
-        />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "로그인 중..." : "로그인"}
-        </Button>
-      </form>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <InputField
+            name="email"
+            type="email"
+            placeholder="이메일"
+            value={form.email}
+            onChange={handleChange}
+            className="w-full border border-gray-400 rounded-md px-4 py-3 text-sm"
+          />
+          <InputField
+            name="password"
+            type="password"
+            placeholder="비밀번호"
+            value={form.password}
+            onChange={handleChange}
+            className="w-full border border-gray-400 rounded-md px-4 py-3 text-sm"
+          />
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-black text-white font-semibold py-2 rounded hover:bg-gray-900 transition mt-2"
+          >
+            {isLoading ? "로그인 중..." : "로그인"}
+          </button>
+
+          <ErrorMessage message={errorMessage} />
+        </form>
+      </div>
     </div>
   );
 }
