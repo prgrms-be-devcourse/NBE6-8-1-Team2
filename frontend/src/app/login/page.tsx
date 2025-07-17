@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin } from "@/hooks/useLogin";
+import { useLogin } from "@/_hooks/useLogin";
 import { LoginForm } from "@/types";
-import { InputField } from "@/components/ui/InputField";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { InputField } from "@/_components/ui/InputField";
+import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function LoginPage() {
   const { login, isLoading, errorMessage } = useLogin();

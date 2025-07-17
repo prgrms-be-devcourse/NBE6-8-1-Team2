@@ -3,10 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { MenuItem, CartItem } from "@/types";
-import { useOrder } from "@/hooks/useOrder";
-import { MenuCard } from "@/components/order/MenuCard";
-import { CartItemCard } from "@/components/order/CartItemCard";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { useOrder } from "@/_hooks/useOrder";
+import { MenuCard } from "@/_components/order/MenuCard";
+import { CartItemCard } from "@/_components/order/CartItemCard";
+import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function OrderPage() {
   const [menus, setMenus] = useState<MenuItem[]>([]);

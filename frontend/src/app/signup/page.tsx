@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSignup } from "@/hooks/useSignup";
+import { useSignup } from "@/_hooks/useSignup";
 import { SignupForm } from "@/types";
-import { InputField } from "@/components/ui/InputField";
-import { Button } from "@/components/ui/Button";
-import { ErrorMessage } from "@/components/ui/ErrorMessage";
+import { InputField } from "@/_components/ui/InputField";
+import { Button } from "@/_components/ui/Button";
+import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function SignupPage() {
   const router = useRouter();

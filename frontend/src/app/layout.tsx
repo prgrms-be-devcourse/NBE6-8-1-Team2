@@ -1,7 +1,7 @@
 "use client";  // 클라이언트 컴포넌트로 지정
 
 import { usePathname } from "next/navigation"; 
-import Header from "@/components/Header"; 
+import Header from "@/_components/Header"; 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
