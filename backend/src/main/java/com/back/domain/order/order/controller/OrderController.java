@@ -3,6 +3,8 @@ package com.back.domain.order.order.controller;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.entity.Role;
 import com.back.domain.member.member.repository.MemberRepository;
+import com.back.domain.menu.menu.dto.MenuResponseDto;
+import com.back.domain.menu.menu.service.MenuService;
 import com.back.domain.order.order.dto.OrderRequestDto;
 import com.back.domain.order.order.dto.OrderResponseDto;
 import com.back.domain.order.order.service.OrderService;
@@ -20,6 +22,19 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final MenuService menuService;
+
+    /*
+        Security 인증 적용 전, Member관련 PR 적용시 수정할것!
+        Get /orders : 주문 전체 조회
+     */
+    @GetMapping("/menus")
+    @Operation(summary = "메뉴 목록 조회")
+    public List<MenuResponseDto> getMenus(@RequestParam int memberId )    // 로그인 한 사람만 조회 가능
+                              // @AuthenticationPrincipal User user 추후 수정예정
+    {
+        return orderService.getAllMenus(memberId);
+    }
 
     /*
         Security 인증 적용 전, Member관련 PR 적용시 수정할것!
@@ -31,7 +46,7 @@ public class OrderController {
             @RequestBody OrderRequestDto orderRequestDto,
             @RequestParam int memberId
             // @AuthenticationPrincipal User user   // 추후 수정 예정 부분
-            ) {
+    ) {
         Member member = memberRepository.findById((memberId))    // 추후 수정 예정 부분
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
 
@@ -58,7 +73,7 @@ public class OrderController {
     @GetMapping("/myorder")
     @Operation(summary = "내 주문 조회 (member id필요)")
     public List<OrderResponseDto> getMyOrders(@RequestParam int memberId // 추후 수정 예정
-            // @AuthenticationPrincipal User user
+                                              // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
@@ -83,7 +98,7 @@ public class OrderController {
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")
     public List<OrderResponseDto> getAllOrders(@RequestParam int memberId // 추후 수정 예정
-            // @AuthenticationPrincipal User user
+                                               // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("user not found"));

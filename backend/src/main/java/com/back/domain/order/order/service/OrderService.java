@@ -3,6 +3,7 @@ package com.back.domain.order.order.service;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.entity.Role;
 import com.back.domain.member.member.repository.MemberRepository;
+import com.back.domain.menu.menu.dto.MenuResponseDto;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
 import com.back.domain.order.order.dto.OrderMenuDto;
@@ -26,6 +27,15 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
 
+    // 사용자 검증을 포함한 메뉴 조회
+    public List<MenuResponseDto> getAllMenus(int memberId) {
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인/회원가입 후 진행 해 주세요" ));
+        return menuRepository.findAll().stream()
+                .map(MenuResponseDto::from)
+                .toList();
+    }
+
     // 주문 등록
     public OrderResponseDto createOrder(OrderRequestDto requestDto, int memberId) {
         final Member member = findMemberById(memberId);
@@ -33,7 +43,7 @@ public class OrderService {
         order.setMember(member);
 
         int totalPrice = 0;
-        for(OrderMenuDto menuDto : requestDto.getOrderMenus()) {
+        for (OrderMenuDto menuDto : requestDto.getOrderMenus()) {
             final Menu menu = findMenuById(menuDto.getMenuId());
             final int quantity = menuDto.getQuantity();
 
@@ -66,7 +76,8 @@ public class OrderService {
                 order.getId(),
                 order.getTotalPrice(),
                 order.getCreateDate(),
-                responseMenus
+                responseMenus,
+                member.getEmail()
         );
     }
 
@@ -78,7 +89,7 @@ public class OrderService {
         boolean isOwner = order.getMember().getId() == (member.getId());
         boolean isAdmin = member.getRole() == Role.ADMIN;
 
-        if(!isOwner && !isAdmin) {
+        if (!isOwner && !isAdmin) {
             throw new IllegalStateException("주문 삭제는 본인 또는 관리자만 가능합니다.");
         }
 
@@ -104,7 +115,8 @@ public class OrderService {
                             order.getId(),
                             order.getTotalPrice(),
                             order.getCreateDate(),
-                            menuResponses
+                            menuResponses,
+                            member.getEmail()
                     );
                 }).toList();
     }
@@ -128,9 +140,8 @@ public class OrderService {
                         om.getMenu().getPrice()
                 )).toList();
 
-        return new OrderResponseDto(order.getId(), order.getTotalPrice(), order.getCreateDate(), menuResponses);
+        return new OrderResponseDto(order.getId(), order.getTotalPrice(), order.getCreateDate(), menuResponses, member.getEmail());
     }
-
 
 
     // 전체 주문 목록 조회 (관리자)
@@ -152,7 +163,8 @@ public class OrderService {
                             order.getId(),
                             order.getTotalPrice(),
                             order.getCreateDate(),
-                            menuResponses
+                            menuResponses,
+                            order.getMember().getEmail()
                     );
                 }).toList();
 
