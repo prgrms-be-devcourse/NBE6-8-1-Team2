@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Header() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem("accessToken"); // localStorage에서 토큰 삭제
     setIsLoggedIn(false); // 로그인 상태 false로 설정
+    toast.success("로그아웃 되었습니다.");
     router.push("/login"); // 로그인 페이지로 이동
   };
 

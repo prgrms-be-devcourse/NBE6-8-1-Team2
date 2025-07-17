@@ -1,8 +1,10 @@
-"use client";  // 클라이언트 컴포넌트로 지정
+"use client";  
 
 import { usePathname } from "next/navigation"; 
 import Header from "@/_components/Header"; 
 import { Geist, Geist_Mono } from "next/font/google";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,10 +27,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* 로그인 페이지가 아닐 때만 상단 바를 표시 */}
-        {pathname !== "/login" && <Header />} 
-        
-        {/* 페이지의 실제 콘텐츠가 들어오는 부분 */}
+        {pathname !== "/signup" && "/login" && <Header />}
+
+        {/* 전역 토스트 컨테이너 */}
+        <ToastContainer
+          position="top-center"
+          autoClose={2000}
+          hideProgressBar
+          pauseOnHover
+          closeOnClick
+          theme="light"
+        />
+
+        {/* 페이지 콘텐츠 */}
         {children}
       </body>
     </html>

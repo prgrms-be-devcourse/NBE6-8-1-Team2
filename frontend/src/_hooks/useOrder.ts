@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch";
 import { CartItem, OrderItem } from "@/types"; 
+import { toast } from "react-toastify";
 
 export function useOrder() {
   const router = useRouter();
@@ -12,7 +13,7 @@ export function useOrder() {
 
   const order = async (cart: CartItem[]) => {
     if (cart.length === 0) {
-      setState({ ...state, errorMessage: "장바구니가 비어 있습니다." });
+      setState({ ...state, errorMessage: "*장바구니가 비어 있습니다."});
       return;
     }
 
@@ -31,10 +32,10 @@ export function useOrder() {
         body: JSON.stringify({ items }),
       });
 
-      alert("주문이 완료되었습니다.");
+      toast.success("주문이 완료되었습니다.");
       router.push("/mypage");
     } catch (err: any) {
-      setState({ ...state, errorMessage: `주문 실패 : ${err.message}`, isLoading: false });
+      toast.error(err.message || "주문 중 오류가 발생했습니다.");
     }
   };
 
