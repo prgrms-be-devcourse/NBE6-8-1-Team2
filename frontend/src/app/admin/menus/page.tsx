@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu } from "@/types";
 import { useRouter } from "next/navigation";
+import { Menu } from "@/types";  // 공용 타입 사용
 
 export default function Menus() {
   const router = useRouter();
