@@ -28,4 +28,12 @@ public class Menu extends BaseEntity {
         this.price = dto.price();
         this.stock_count = dto.stock_count();
     }
+
+    // 재고 감소
+    public void decreaseStock(int quantity) {
+        if (this.stock_count < quantity) {
+            throw new IllegalArgumentException("재고가 부족합니다.");
+        }
+        this.stock_count -= quantity;
+    }
 }

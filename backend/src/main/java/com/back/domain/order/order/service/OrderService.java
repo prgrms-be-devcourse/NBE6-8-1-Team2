@@ -39,8 +39,9 @@ public class OrderService {
             Menu menu = menuRepository.findById(menuDto.getMenuId())
                     .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
 
-            int price = menu.getPrice();
             int quantity = menuDto.getQuantity();
+            menu.decreaseStock(quantity);   // 재고 감소
+            int price = menu.getPrice();
             int subtotal = price * quantity;
             totalPrice += subtotal;
 
@@ -53,6 +54,7 @@ public class OrderService {
         }
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order저장
+
 
         List<OrderMenuResponseDto> responseMenus = order.getOrderMenus().stream()
                 .map(om -> new OrderMenuResponseDto(
@@ -134,6 +136,7 @@ public class OrderService {
 
 
     // 전체 주문 목록 조회 (관리자)
+
     public List<OrderResponseDto> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
