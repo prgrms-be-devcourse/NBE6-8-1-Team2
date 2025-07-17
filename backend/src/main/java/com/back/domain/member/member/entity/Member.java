@@ -14,6 +14,7 @@ public class Member extends BaseEntity{
     private String email;
     private String nickname;
     private String password;
+    private String address;
 
     public enum Role {
         USER, // 일반 사용자
@@ -33,6 +34,13 @@ public class Member extends BaseEntity{
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public Member(String email, String password, String nickname, String address) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.address = address;
     }
 
 
