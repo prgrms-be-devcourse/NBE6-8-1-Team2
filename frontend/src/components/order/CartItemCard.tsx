@@ -17,18 +17,37 @@ export const CartItemCard = memo(function CartItemCard({
   onRemove,
 }: Props) {
   return (
-    <div className="border p-3 flex justify-between items-center rounded">
-      <div>
-        <p className="font-semibold">{item.menu.name}</p>
-        <p className="text-sm text-gray-500">
+    <div className="border border-gray-300 rounded-xl p-5 bg-white flex flex-col gap-2">
+      <div className="flex justify-between items-start">
+        <span className="font-semibold text-base">{item.menu.name}</span>
+        <button
+          onClick={onRemove}
+          className="text-xs px-1.5 py-0.5 mt-[-10px] mr-[-10px] rounded hover:text-red-400"
+        >
+          X
+        </button>
+      </div>
+
+      <div className="flex justify-between items-center mt-[-6px]">
+        <p className="text-sm text-gray-600">
           ₩{item.menu.price.toLocaleString()}
         </p>
-      </div>
-      <div className="flex items-center gap-2">
-        <button onClick={onDecrease} className="px-2 py-1 bg-gray-300 rounded">-</button>
-        <span>{item.quantity}</span>
-        <button onClick={onIncrease} className="px-2 py-1 bg-gray-300 rounded">+</button>
-        <button onClick={onRemove} className="px-2 py-1 bg-red-400 text-white rounded">삭제</button>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onDecrease}
+            className="w-6 h-6 text-xs bg-gray-200 rounded hover:bg-gray-300"
+          >
+            -
+          </button>
+          <span className="text-sm">{item.quantity}</span>
+          <button
+            onClick={onIncrease}
+            className="w-6 h-6 text-xs bg-gray-200 rounded hover:bg-gray-300"
+          >
+            +
+          </button>
+        </div>
       </div>
     </div>
   );

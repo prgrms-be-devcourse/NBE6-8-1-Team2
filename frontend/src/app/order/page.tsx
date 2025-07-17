@@ -33,7 +33,7 @@ export default function OrderPage() {
 
     setMenus(mockMenus);
   }, []);
-  */
+  */  
 
   useEffect(() => {
     apiFetch<MenuItem[]>("/api/menus")
@@ -85,50 +85,71 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">메뉴</h1>
+    <div className="flex flex-col lg:flex-row min-h-screen bg-white">
+      {/* 메뉴 영역 */}
+      <div className="w-full lg:w-2/3 p-6">
+        <h1 className="text-2xl font-bold mb-6">주문</h1>
 
-      <div className="space-y-4">
-        {menus.map((menu) => (
-          <MenuCard key={menu.id} menu={menu} onAdd={() => handleAddToCart(menu)} />
-        ))}
-      </div>
-
-      <h2 className="text-lg font-bold mt-8">장바구니</h2>
-
-      {cart.length === 0 ? (
-        <p className="text-gray-500 mt-2">담은 메뉴가 없습니다.</p>
-      ) : (
-        <div className="space-y-2 mt-4">
-          {cart.map((item) => (
-            <CartItemCard
-              key={item.menu.id}
-              item={item}
-              onIncrease={() => handleIncrease(item.menu.id)}
-              onDecrease={() => handleDecrease(item.menu.id)}
-              onRemove={() => handleRemove(item.menu.id)}
-            />
+        {/* 카테고리 */}
+        <div className="flex gap-2 mb-6">
+          {["커피", "음료", "디저트", "샌드위치", "기타"].map((cat, idx) => (
+            <button
+              key={idx}
+              className="px-4 py-2 bg-gray-200 text-sm rounded hover:bg-gray-300 transition"
+            >
+              {cat}
+            </button>
           ))}
         </div>
-      )}
 
-      <p className="mt-4 text-right font-bold text-lg">
-        총 결제 금액: ₩
-        {cart
-          .reduce((sum, item) => sum + item.menu.price * item.quantity, 0)
-          .toLocaleString()}
-      </p>
+        {/* 메뉴 카드 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {menus.map((menu) => (
+            <MenuCard key={menu.id} menu={menu} onAdd={() => handleAddToCart(menu)} />
+          ))}
+        </div>
+      </div>
 
-      <button
-        type="button"
-        onClick={handleOrder}
-        disabled={isLoading}
-        className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-      >
-        {isLoading ? "결제 처리 중..." : "결제하기"}
-      </button>
+      {/* 장바구니 영역 */}
+      <div className="w-full lg:w-1/3 border-l border-gray-200 p-6 bg-gray-50">
+        <h2 className="text-xl font-bold mb-4">Cart</h2>
 
-      <ErrorMessage message={errorMessage} />
+        {cart.length === 0 ? (
+          <p className="text-gray-500">장바구니가 비어 있습니다.</p>
+        ) : (
+          <div className="space-y-4">
+            {cart.map((item) => (
+              <CartItemCard
+                key={item.menu.id}
+                item={item}
+                onIncrease={() => handleIncrease(item.menu.id)}
+                onDecrease={() => handleDecrease(item.menu.id)}
+                onRemove={() => handleRemove(item.menu.id)}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 총 금액 */}
+        <p className="mt-6 text-right font-semibold text-lg">
+          총 결제 금액 : ₩
+          {cart
+            .reduce((sum, item) => sum + item.menu.price * item.quantity, 0)
+            .toLocaleString()}
+        </p>
+
+        {/* 결제 버튼 */}
+        <button
+          type="button"
+          onClick={handleOrder}
+          disabled={isLoading}
+          className="mt-4 w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-900 transition"
+        >
+          {isLoading ? "결제 처리 중..." : "결제하기"}
+        </button>
+
+        <ErrorMessage message={errorMessage} />
+      </div>
     </div>
   );
 }
