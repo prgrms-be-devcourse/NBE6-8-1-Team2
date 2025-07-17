@@ -1,6 +1,3 @@
-"use client";  
-
-import { usePathname } from "next/navigation"; 
 import Header from "@/_components/Header"; 
 import { Geist, Geist_Mono } from "next/font/google";
 import { ToastContainer } from "react-toastify";
@@ -22,12 +19,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname(); // 현재 경로 가져오기
 
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {pathname !== "/signup" && "/login" && <Header />}
+      <Header /> 
 
         {/* 전역 토스트 컨테이너 */}
         <ToastContainer
