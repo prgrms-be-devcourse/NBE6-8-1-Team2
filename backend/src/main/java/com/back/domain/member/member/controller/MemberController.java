@@ -1,7 +1,9 @@
 package com.back.domain.member.member.controller;
 
+import com.back.domain.member.member.dto.MemberDto;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
+import com.back.global.exception.ServiceException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,16 +11,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping
 @RequiredArgsConstructor
-@Tag(name = "MemberAPI(임시용)", description = "임시로 사용하는 Member관련 API입니다")
+@Tag(name = "MemberAPI", description = "Member관련 API입니다")
 public class MemberController {
 
     private final MemberService memberService;
@@ -41,7 +42,7 @@ public class MemberController {
             String address
     ) {}
 
-    @PostMapping
+    @PostMapping("/signup")
     public RsData<MemberDto> join(
             @Valid @RequestBody MemberJoinReqBody reqBody
     ) {
