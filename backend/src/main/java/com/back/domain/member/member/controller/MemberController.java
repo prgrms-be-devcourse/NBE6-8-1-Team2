@@ -66,12 +66,6 @@ public class MemberController {
 
     }
 
-    @Operation(summary = "유저 생성 (임시)")
-    @PostMapping
-    public ResponseEntity<Member> create(@RequestBody Member member ) {
-        return ResponseEntity.ok(memberService.createUser(member));
-    }
-
     @Operation(summary = "유저 조회 (임시)")
     @GetMapping("/{id}")
     public ResponseEntity<Member> getById(@PathVariable int id) {
