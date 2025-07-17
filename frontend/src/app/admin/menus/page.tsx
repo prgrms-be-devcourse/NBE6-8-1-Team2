@@ -19,6 +19,31 @@ export default function Menus() {
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
 
+  // ✅ 더미 데이터 (백엔드 API 안될 때 테스트용)
+  const dummyMenus: Menu[] = [
+    {
+      id: 1,
+      name: "아메리카노",
+      description: "진한 에스프레소와 물의 조화",
+      price: 4500,
+      stockCount: 20,
+    },
+    {
+      id: 2,
+      name: "카페라떼",
+      description: "부드러운 우유와 에스프레소",
+      price: 5000,
+      stockCount: 15,
+    },
+    {
+      id: 3,
+      name: "카푸치노",
+      description: "풍부한 거품과 진한 커피",
+      price: 5500,
+      stockCount: 10,
+    },
+  ];
+
   // 메뉴 목록 불러오기
   const fetchMenus = async () => {
     try {
@@ -37,8 +62,8 @@ export default function Menus() {
 
       setMenus(data);
     } catch (error) {
-      console.error(error);
-      alert("메뉴 목록을 가져오는 중 오류가 발생했습니다.");
+      console.error("API 호출 실패 → 더미 데이터 사용", error);
+      setMenus(dummyMenus); // ✅ API 실패 시 fallback
     } finally {
       setLoading(false);
     }
@@ -77,12 +102,12 @@ export default function Menus() {
   };
 
   // 수정 버튼 → 수정 페이지 이동
-  const handleEdit = (id: number) => {
+  const handleEditMenu = (id: number) => {
     router.push(`/admin/menus/${id}`); 
   };
 
   // 삭제 버튼 → 확인하고 API 호출 후 응답 메시지 출력
-  const handleDelete = async (id: number) => {
+  const handleDeleteMenu = async (id: number) => {
     const confirmed = confirm("정말 이 메뉴를 삭제하시겠습니까?");
     if (!confirmed) return;
 
@@ -113,57 +138,59 @@ export default function Menus() {
       {/* 메뉴 등록 버튼 → 모달 열기 */}
       <button
         onClick={openModal}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="mb-4 px-4 py-2 bg-black text-white hover:bg-neutral-800"
       >
-        + 메뉴 등록
+        메뉴 등록
       </button>
 
-      <table className="w-full border-collapse bg-white shadow">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">ID</th>
-            <th className="border p-2">이름</th>
-            <th className="border p-2">설명</th>
-            <th className="border p-2">가격</th>
-            <th className="border p-2">재고</th>
-            <th className="border p-2">관리</th>
-          </tr>
-        </thead>
-        <tbody>
-          {menus.map((menu) => (
-            <tr key={menu.id}>
-              <td className="border p-2 text-center">{menu.id}</td>
-              <td className="border p-2">{menu.name}</td>
-              <td className="border p-2">{menu.description}</td>
-              <td className="border p-2 text-right">
-                {menu.price.toLocaleString()}원
-              </td>
-              <td className="border p-2 text-center">{menu.stockCount}</td>
-              <td className="border p-2 text-center space-x-2">
-                {/* 수정 페이지로 이동 */}
-                <button
-                  className="px-2 py-1 bg-yellow-400 rounded hover:bg-yellow-500"
-                  onClick={() => handleEdit(menu.id)}
-                >
-                  수정
-                </button>
-                {/* 삭제 버튼 */}
-                <button
-                  onClick={() => handleDelete(menu.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  삭제
-                </button>
-              </td>
+      <div className="overflow-x-auto border border-gray-300">
+        <table className="w-full table-auto text-sm text-left text-black bg-white">
+          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12 border-b border-gray-300">
+            <tr>
+              <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">이름</th>
+              <th className="px-4 py-2 text-left">설명</th>
+              <th className="px-4 py-2 text-left">가격</th>
+              <th className="px-4 py-2 text-left">재고</th>
+              <th className="px-4 py-2 text-left">관리</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-gray-300">
+            {menus.map((menu) => (
+              <tr key={menu.id} className="hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 text-left font-medium">{menu.id}</td>
+                <td className="px-4 py-3 text-left">{menu.name}</td>
+                <td className="px-4 py-3 text-left">{menu.description}</td>
+                <td className="px-4 py-3 text-right">
+                  {menu.price.toLocaleString()}원
+                </td>
+                <td className="px-4 py-3 text-left">{menu.stockCount}</td>
+                <td className="px-4 py-3 text-left space-x-2">
+                  {/* 수정 버튼 */}
+                  <button
+                    className="px-2 py-1 bg-black text-white hover:bg-neutral-800"
+                    onClick={() => handleEditMenu(menu.id)}
+                  >
+                    수정
+                  </button>
+                  {/* 삭제 버튼 */}
+                  <button
+                    onClick={() => handleDeleteMenu(menu.id)}
+                    className="px-2 py-1 bg-gray-500 text-white hover:bg-gray-400"
+                  >
+                    삭제
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* 메뉴 등록 모달 */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow max-w-md w-full">
+          <div className="bg-white p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">메뉴 등록</h2>
 
             <form onSubmit={handleCreateMenu} className="space-y-4">
@@ -171,7 +198,7 @@ export default function Menus() {
                 <label className="block font-semibold">메뉴 이름</label>
                 <input
                   type="text"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="메뉴 이름을 입력하세요"
@@ -181,7 +208,7 @@ export default function Menus() {
               <div>
                 <label className="block font-semibold">설명</label>
                 <textarea
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="메뉴 설명을 입력하세요"
@@ -192,7 +219,7 @@ export default function Menus() {
                 <label className="block font-semibold">가격</label>
                 <input
                   type="number"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
                   placeholder="가격을 입력하세요"
@@ -203,7 +230,7 @@ export default function Menus() {
                 <label className="block font-semibold">재고</label>
                 <input
                   type="number"
-                  className="w-full border p-2 rounded"
+                  className="w-full border p-2"
                   value={stockCount}
                   onChange={(e) => setStockCount(Number(e.target.value))}
                   placeholder="재고 수량을 입력하세요"
@@ -214,13 +241,13 @@ export default function Menus() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
                 >
                   등록하기
                 </button>
