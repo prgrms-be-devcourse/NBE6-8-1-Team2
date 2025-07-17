@@ -66,8 +66,6 @@ export default function EditMenu({ params }: Props) {
 
       // 수정된 메뉴 응답 받기
       const updated = await res.json();
-      console.log("수정된 메뉴:", updated);
-
       alert(
         `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${updated.name}\n- 설명: ${updated.description}\n- 가격: ${updated.price}원\n- 재고: ${updated.stock_count}개`
       );
@@ -82,59 +80,75 @@ export default function EditMenu({ params }: Props) {
   if (loading) return <p>로딩 중입니다...</p>;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">메뉴 수정</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-        <div>
-          <label className="block font-semibold">메뉴 이름</label>
-          <input
-            type="text"
-            className="w-full border p-2 rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="메뉴 이름을 입력하세요"
-          />
-        </div>
+    <div className="px-4 w-full flex justify-center">
+      <div className="w-full max-w-full md:max-w-lg">
+        <h1 className="text-2xl font-bold mb-4">메뉴 수정</h1>
 
-        <div>
-          <label className="block font-semibold">설명</label>
-          <textarea
-            className="w-full border p-2 rounded"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="메뉴 설명을 입력하세요"
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block font-semibold">메뉴 이름</label>
+            <input
+              type="text"
+              className="w-full border p-2 rounded"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="메뉴 이름을 입력하세요"
+            />
+          </div>
 
-        <div>
-          <label className="block font-semibold">가격</label>
-          <input
-            type="number"
-            className="w-full border p-2 rounded"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            placeholder="가격을 입력하세요"
-          />
-        </div>
+          <div>
+            <label className="block font-semibold">설명</label>
+            <textarea
+              className="w-full border p-2 rounded"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="메뉴 설명을 입력하세요"
+            />
+          </div>
 
-        <div>
-          <label className="block font-semibold">재고</label>
-          <input
-            type="number"
-            className="w-full border p-2 rounded"
-            value={stockCount}
-            onChange={(e) => setStockCount(Number(e.target.value))}
-            placeholder="재고 수량을 입력하세요"
-          />
-        </div>
+          <div>
+            <label className="block font-semibold">가격</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              placeholder="가격을 입력하세요"
+            />
+          </div>
 
-        <button
-          type="submit"
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          수정하기
-        </button>
-      </form>
+          <div>
+            <label className="block font-semibold">재고</label>
+            <input
+              type="number"
+              className="w-full border p-2 rounded"
+              value={stockCount}
+              onChange={(e) => setStockCount(Number(e.target.value))}
+              placeholder="재고 수량을 입력하세요"
+            />
+          </div>
+
+          {/* 버튼 그룹: 오른쪽 정렬 */}
+          <div className="flex justify-end gap-2 pt-4">
+            {/* 취소 버튼 */}
+            <button
+              type="button"
+              onClick={() => router.push("/admin/menus")}
+              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+            >
+              취소
+            </button>
+
+            {/* 수정 버튼 */}
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              수정하기
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
