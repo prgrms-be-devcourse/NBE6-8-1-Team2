@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch";
-import { LoginForm } from "@/types";  
+import { LoginForm } from "@/types";
 import { saveToken } from "@/lib/authService";
+import { toast } from "react-toastify";
 
 const validateLoginForm = (form: LoginForm): string | null => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,17 +14,15 @@ const validateLoginForm = (form: LoginForm): string | null => {
 
 export function useLogin() {
   const router = useRouter();
-  const [state, setState] = useState<UseApiState>({
-    isLoading: false,
-    errorMessage: "",
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const login = async (form: LoginForm) => {
-    setState({ ...state, errorMessage: "", isLoading: true });
+    setIsLoading(true);
 
-    const error = validateLoginForm(form);
-    if (error) {
-      setState({ ...state, errorMessage: error, isLoading: false });
+    const validationError = validateLoginForm(form);
+    if (validationError) {
+      toast.error(validationError);
+      setIsLoading(false);
       return;
     }
 
@@ -34,12 +33,17 @@ export function useLogin() {
       });
 
       saveToken(res.token);
-      alert("로그인 성공");
+      toast.success("로그인 성공");
       router.push("/order");
     } catch (err: any) {
-      setState({ ...state, errorMessage: `로그인 실패: ${err.message}`, isLoading: false });
+      toast.error(err.message || "로그인에 실패했습니다.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { login, isLoading: state.isLoading, errorMessage: state.errorMessage };
+  return {
+    login,
+    isLoading,
+  };
 }

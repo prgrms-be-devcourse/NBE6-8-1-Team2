@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 import { SignupForm } from "@/types";
+import { toast } from "react-toastify";
 
 export function useSignup() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,9 +17,9 @@ export function useSignup() {
         body: JSON.stringify(form),
       });
 
-      alert("회원가입 성공");
+      toast.success("회원가입이 완료되었습니다.");
     } catch (err: any) {
-      setErrorMessage(`회원가입 실패: ${err.message}`);
+      toast.error(err.message || "회원가입에 실패했습니다.");
     } finally {
       setIsLoading(false); // 로딩 끝
     }

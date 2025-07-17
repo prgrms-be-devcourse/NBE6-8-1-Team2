@@ -12,6 +12,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+    private final PasswordEncoder passwordEncoder;
 
     record MemberJoinReqBody(
             @NotBlank
@@ -53,7 +55,7 @@ public class MemberController {
 
         Member member = memberService.join(
                 reqBody.email(),
-                reqBody.password(),
+                passwordEncoder.encode(reqBody.password()),
                 reqBody.nickname(),
                 reqBody.address()
         );
