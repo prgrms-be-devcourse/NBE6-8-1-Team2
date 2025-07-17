@@ -6,10 +6,7 @@ import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.dto.MenuResponseDto;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
-import com.back.domain.order.order.dto.OrderMenuDto;
-import com.back.domain.order.order.dto.OrderMenuResponseDto;
-import com.back.domain.order.order.dto.OrderRequestDto;
-import com.back.domain.order.order.dto.OrderResponseDto;
+import com.back.domain.order.order.dto.*;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderRepository;
@@ -146,7 +143,7 @@ public class OrderService {
 
     // 전체 주문 목록 조회 (관리자)
 
-    public List<OrderResponseDto> getAllOrders() {
+    public List<AdminOrderResponseDto> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
         return orders.stream()
@@ -159,12 +156,13 @@ public class OrderService {
                                     om.getMenu().getPrice()
                             )).toList();
 
-                    return new OrderResponseDto(
+                    return new AdminOrderResponseDto(
                             order.getId(),
-                            order.getTotalPrice(),
+                            order.getMember().getId(),
+                            order.getMember().getEmail(),
                             order.getCreateDate(),
-                            menuResponses,
-                            order.getMember().getEmail()
+                            order.getTotalPrice(),
+                            menuResponses
                     );
                 }).toList();
 
