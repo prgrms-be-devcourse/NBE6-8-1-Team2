@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch"; 
 import { Order } from "@/types";
-import { OrderCard } from "@/components/mypage/OrderCard";
+import { OrderCard } from "@/_components/mypage/OrderCard";
 
 export default function MyPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -23,7 +23,7 @@ export default function MyPage() {
       });
 
     /*
-    // 🔧 테스트용 데이터 
+    // 테스트용 데이터 
     const mockData: Order[] = [
       {
         orderId: 101,
@@ -50,21 +50,18 @@ export default function MyPage() {
     );
     setOrders(sorted);
     */
+
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">내 주문 내역</h1>
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">내 주문 내역</h1>
 
-      {orders.length === 0 ? (
-        <p>주문 내역이 없습니다.</p>
-      ) : (
-        <ul className="space-y-6">
-          {orders.map((order) => (
-            <OrderCard key={order.orderId} order={order} />
-          ))}
-        </ul>
-      )}
+      <div className="flex flex-col gap-6 max-h-[80vh] overflow-y-auto pr-2">
+        {orders.map((order) => (
+          <OrderCard key={order.orderId} order={order} />
+        ))}
+      </div>
     </div>
   );
 }
