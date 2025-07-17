@@ -1,11 +1,13 @@
 package com.back.global.globalExceptionHandler;
 
 import com.back.global.rsData.RsData;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 @ControllerAdvice
+@Hidden // Swagger에서 이 클래스 숨김 처리(로직은 정상 작동)
 public class GlobalExceptionHandler {
 
     // 일반적인 IllegalArgumentException 처리

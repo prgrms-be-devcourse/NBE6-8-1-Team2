@@ -6,6 +6,7 @@ import com.back.domain.order.order.service.OrderService;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 // import org.springframework.security.core.annotation.AuthenticationPrincipal; 시큐리티 보류
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
+@Tag(name = "OrderAPI", description = "관리자 및 사용자가 사용하는 주문 CRUD API")
 public class OrderController {
 
     private final OrderService orderService;
@@ -36,6 +38,21 @@ public class OrderController {
         return orderService.createOrder(orderRequestDto);
     }
 
+    /*
+        Security 인증 적용 전, Member관련 PR 적용시 수정할것!
+    */
+    @DeleteMapping("/orders/{orderId}")
+    @Operation(summary = "주문 삭제")
+    public String deleteOrder(
+            @PathVariable int orderId,
+            @RequestParam int memberId // 추후 @AutenticationPrincipal User user
+    ) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        orderService.deleteOrder(orderId, member);
+        return "주문 삭제 완료";
+    }
 
 
     @GetMapping("/myorder")
@@ -48,6 +65,21 @@ public class OrderController {
 
         return orderService.getMyOrders(member);
     }
+
+    @GetMapping("/myorder/{orderId}")
+    @Operation(summary = "내 주문 상세 조회")
+    public OrderResponseDto getOrderDetail(
+            @PathVariable int orderId,
+            @RequestParam int memberId // 추후 수정 예정
+            // @AuthenticationPrincipal User user
+    ) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
+        return orderService.getOrderDetailById(orderId, member);
+    }
+
+
 
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")

@@ -4,6 +4,8 @@ import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
+import com.back.domain.order.order.entity.Order;
+import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,29 @@ public class OrderInitData {
         user = new Member("user2@example.com", "1234");
         memberRepository.save(user);
 
+        user = new Member("user3@example.com", "1234");
+        memberRepository.save(user);
+
+        // 3. 주문 등록
+        Order order = new Order();
+        order.setMember(user);
+
+        OrderMenu om1 = new OrderMenu();
+        om1.setOrder(order);
+        om1.setMenu(americano);
+        om1.setQuantity(2);
+        order.addOrderMenu(om1);
+
+        OrderMenu om2 = new OrderMenu();
+        om2.setOrder(order);
+        om2.setMenu(latte);
+        om2.setQuantity(1);
+        order.addOrderMenu(om2);
+
+        int totalPrice = om1.getMenu().getPrice() * om1.getQuantity() + om2.getMenu().getPrice() * om2.getQuantity();
+        order.setTotalPrice(totalPrice);
+
+        orderRepository.save(order);
 
     }
 }
