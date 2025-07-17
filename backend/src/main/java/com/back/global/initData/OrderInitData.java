@@ -26,23 +26,23 @@ public class OrderInitData {
     public void init() {
         // 1. 메뉴 등록
         Menu americano = menuRepository.save(new Menu("아메리카노", "아메리카노 입니다", 3000, 200));
-        Menu latte = menuRepository.save(new Menu("카페라떼","카페라떼입니다", 4000, 200));
+        Menu latte = menuRepository.save(new Menu("카페라떼", "카페라떼입니다", 4000, 200));
         Menu mocha = menuRepository.save(new Menu("카페모카", "달콤한 초콜릿이 들어간 카페모카입니다", 4500, 150));
         Menu vanillaLatte = menuRepository.save(new Menu("바닐라라떼", "향긋한 바닐라 시럽이 들어간 라떼입니다", 4500, 180));
         Menu espresso = menuRepository.save(new Menu("에스프레소", "진한 원두의 향을 즐길 수 있는 에스프레소입니다", 2500, 100));
 
 
         // 2. 사용자 등록
-        Member user = new Member("admin1@example.com", "1234", Role.ADMIN);
+        Member user = new Member("admin1@example.com", "123456", Role.ADMIN);
         memberRepository.save(user);
 
-        user = new Member("user1@example.com", "1234", "user1", "서울시 강남구");
+        user = new Member("user1@example.com", "123456", "user1", "서울시 강남구");
         memberRepository.save(user);
 
-        user = new Member("user2@example.com", "1234", "user2", "서울시 마포구");
+        user = new Member("user2@example.com", "123456", "user2", "서울시 마포구");
         memberRepository.save(user);
 
-        user = new Member("user3@example.com", "1234", "user3", "서울시 성동구");
+        user = new Member("user3@example.com", "123456", "user3", "서울시 성동구");
         memberRepository.save(user);
 
         // 3. 주문 등록
