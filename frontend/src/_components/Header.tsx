@@ -26,7 +26,7 @@ export default function Header() {
 
   return (
     <header className="bg-black text-white px-6 py-4 flex justify-between items-center shadow">
-      <h1 className="text-xl font-bold">Grids & Circles</h1>
+      <h1 className="text-3xl font-title font-bold">Grids & Circles</h1>
       <nav>
         {isLoggedIn ? (
           <button

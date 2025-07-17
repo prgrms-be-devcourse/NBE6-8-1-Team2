@@ -1,16 +1,16 @@
-// tailwind.config.ts
 import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./src/app/**/*.{js,ts,jsx,tsx}",
-    "./src/_components/**/*.{js,ts,jsx,tsx}",
-    "./src/_hooks/**/*.{js,ts,jsx,tsx}",
-    "./src/lib/**/*.{js,ts,jsx,tsx}",
-    "./src/types/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}", // 실제 경로
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],       // 기본 본문용
+        title: ["var(--font-montserrat)", "sans-serif"], // 헤더 제목용
+      },
+    },
   },
   plugins: [],
 };
