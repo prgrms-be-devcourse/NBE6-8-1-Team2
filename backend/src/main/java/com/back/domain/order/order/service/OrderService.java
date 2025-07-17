@@ -27,21 +27,17 @@ public class OrderService {
 
     // 주문 등록
     public OrderResponseDto createOrder(OrderRequestDto requestDto, int memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
-
-
-        Order order = new Order();
+        final Member member = findMemberById(memberId);
+        final Order order = new Order();
         order.setMember(member);
+
         int totalPrice = 0;
-
         for(OrderMenuDto menuDto : requestDto.getOrderMenus()) {
-            Menu menu = menuRepository.findById(menuDto.getMenuId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
+            final Menu menu = findMenuById(menuDto.getMenuId());
+            final int quantity = menuDto.getQuantity();
 
-            int quantity = menuDto.getQuantity();
             menu.decreaseStock(quantity);   // 재고 감소
-
+            // 리팩터링 중
             int price = menu.getPrice();
             int subtotal = price * quantity;
             totalPrice += subtotal;
@@ -160,4 +156,18 @@ public class OrderService {
                 }).toList();
 
     }
+
+    // Member 존재 확인
+    private Member findMemberById(int memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
+    }
+
+    // Menu 존재 확인
+    private Menu findMenuById(int menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
+    }
+
+
 }
