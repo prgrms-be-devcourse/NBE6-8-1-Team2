@@ -35,7 +35,7 @@ public class OrderController {
         Member member = memberRepository.findById((memberId))    // 추후 수정 예정 부분
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
 
-        return orderService.createOrder(orderRequestDto);
+        return orderService.createOrder(orderRequestDto, memberId);
     }
 
     /*

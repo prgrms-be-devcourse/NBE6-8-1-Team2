@@ -26,11 +26,11 @@ public class OrderService {
     private final MemberRepository memberRepository;
 
     // 주문 등록
-    public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        Member member = memberRepository.findById(requestDto.getMemberId())
+    public OrderResponseDto createOrder(OrderRequestDto requestDto, int memberId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
 
-        // 주문생성
+
         Order order = new Order();
         order.setMember(member);
         int totalPrice = 0;
@@ -41,6 +41,7 @@ public class OrderService {
 
             int quantity = menuDto.getQuantity();
             menu.decreaseStock(quantity);   // 재고 감소
+
             int price = menu.getPrice();
             int subtotal = price * quantity;
             totalPrice += subtotal;
