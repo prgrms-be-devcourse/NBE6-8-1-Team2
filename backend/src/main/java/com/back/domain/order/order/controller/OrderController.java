@@ -1,14 +1,14 @@
 package com.back.domain.order.order.controller;
 
+import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.entity.Role;
+import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.order.order.dto.OrderRequestDto;
 import com.back.domain.order.order.dto.OrderResponseDto;
 import com.back.domain.order.order.service.OrderService;
-import com.back.domain.member.member.entity.Member;
-import com.back.domain.member.member.repository.MemberRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-// import org.springframework.security.core.annotation.AuthenticationPrincipal; 시큐리티 보류
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class OrderController {
         Member member = memberRepository.findById((memberId))    // 추후 수정 예정 부분
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
 
-        return orderService.createOrder(orderRequestDto);
+        return orderService.createOrder(orderRequestDto, memberId);
     }
 
     /*
@@ -88,7 +88,7 @@ public class OrderController {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("user not found"));
         // 권한
-        if (member.getRole() != Member.Role.ADMIN) {
+        if (member.getRole() != Role.ADMIN) {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
 

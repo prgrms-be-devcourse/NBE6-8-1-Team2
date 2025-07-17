@@ -1,6 +1,7 @@
 package com.back.domain.order.order.service;
 
 import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.entity.Role;
 import com.back.domain.member.member.repository.MemberRepository;
 import com.back.domain.menu.menu.entity.Menu;
 import com.back.domain.menu.menu.repository.MenuRepository;
@@ -26,21 +27,18 @@ public class OrderService {
     private final MemberRepository memberRepository;
 
     // 주문 등록
-    public OrderResponseDto createOrder(OrderRequestDto requestDto) {
-        Member member = memberRepository.findById(requestDto.getMemberId())
-                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
-
-        // 주문생성
-        Order order = new Order();
+    public OrderResponseDto createOrder(OrderRequestDto requestDto, int memberId) {
+        final Member member = findMemberById(memberId);
+        final Order order = new Order();
         order.setMember(member);
+
         int totalPrice = 0;
-
         for(OrderMenuDto menuDto : requestDto.getOrderMenus()) {
-            Menu menu = menuRepository.findById(menuDto.getMenuId())
-                    .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
+            final Menu menu = findMenuById(menuDto.getMenuId());
+            final int quantity = menuDto.getQuantity();
 
-            int quantity = menuDto.getQuantity();
             menu.decreaseStock(quantity);   // 재고 감소
+            // 리팩터링 중
             int price = menu.getPrice();
             int subtotal = price * quantity;
             totalPrice += subtotal;
@@ -78,7 +76,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
 
         boolean isOwner = order.getMember().getId() == (member.getId());
-        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+        boolean isAdmin = member.getRole() == Role.ADMIN;
 
         if(!isOwner && !isAdmin) {
             throw new IllegalStateException("주문 삭제는 본인 또는 관리자만 가능합니다.");
@@ -117,7 +115,7 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
 
         boolean isOwner = order.getMember().getId() == member.getId();
-        boolean isAdmin = member.getRole() == Member.Role.ADMIN;
+        boolean isAdmin = member.getRole() == Role.ADMIN;
         if (!isOwner && !isAdmin) {
             throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
         }
@@ -159,4 +157,18 @@ public class OrderService {
                 }).toList();
 
     }
+
+    // Member 존재 확인
+    private Member findMemberById(int memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
+    }
+
+    // Menu 존재 확인
+    private Menu findMenuById(int menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
+    }
+
+
 }
