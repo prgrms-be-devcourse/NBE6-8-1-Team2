@@ -61,7 +61,7 @@ export default function Menus() {
           name,
           description,
           price,
-          stockCount,
+          stock_count: stockCount, // stockCount → stock_count로 수정
         }),
         headers: { "Content-Type": "application/json" },
       });
