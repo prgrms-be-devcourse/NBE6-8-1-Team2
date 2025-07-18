@@ -1,33 +1,33 @@
-"use client";  
-
-import { usePathname } from "next/navigation"; 
-import Header from "@/_components/Header"; 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat, Inter } from "next/font/google";
+import Header from "@/_components/Header";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; 
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({ // 기본 폰트
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const montserrat = Montserrat({ // font-title로 사용 
   subsets: ["latin"],
+  variable: "--font-montserrat",
 });
+
+export const metadata = {
+  title: "Grids & Circles",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname(); // 현재 경로 가져오기
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {pathname !== "/signup" && "/login" && <Header />}
+    <html lang="ko">
+      <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
+      <Header /> 
 
         {/* 전역 토스트 컨테이너 */}
         <ToastContainer
