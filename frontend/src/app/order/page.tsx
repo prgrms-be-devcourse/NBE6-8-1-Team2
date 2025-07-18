@@ -141,8 +141,8 @@ export default function OrderPage() {
 
         {/* 로그인 안내 */}
         {!isLoggedIn && (
-          <p className="mt-2 text-sm text-red-500 text-center">
-            로그인 후 결제할 수 있습니다.
+          <p className="mt-2 text-sm text-red-500 text-left">
+            *로그인 후 결제할 수 있습니다.
           </p>
         )}
 
