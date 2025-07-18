@@ -39,7 +39,7 @@ public class SecurityConfig {
                 )
 
                 // 로그인/로그아웃 기본 설정
-                .formLogin(Customizer.withDefaults())
+//                .formLogin(Customizer.withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"));
 
         return http.build();
