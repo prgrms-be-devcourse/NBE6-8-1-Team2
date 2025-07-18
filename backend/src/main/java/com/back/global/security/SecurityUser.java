@@ -1,23 +1,19 @@
 package com.back.global.security;
 
+import com.back.domain.member.member.entity.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
+@Getter
 public class SecurityUser extends User {
-    @Getter
-    private String email;
-    @Getter
-    private String nickname;
-    @Getter
-    private String address;
 
-    public SecurityUser(String email, String nickname, String address, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(email, password, authorities);
-        this.email = email;
-        this.nickname = nickname;
-        this.address = address;
+    private final Member member;
+
+    public SecurityUser(Member member, Collection<? extends GrantedAuthority> authorities) {
+        super(member.getEmail(), member.getPassword(), authorities);
+        this.member = member;
     }
 }
