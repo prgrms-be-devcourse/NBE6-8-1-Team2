@@ -10,7 +10,7 @@ export default function MyPage() {
 
   useEffect(() => {
     // API 호출
-    apiFetch<Order[]>("/api/myorder")
+    apiFetch<Order[]>("/myorder")
       .then((data) => {
         const sorted = data.sort( // 최신 순 정렬
           (a, b) =>

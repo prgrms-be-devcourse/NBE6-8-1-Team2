@@ -13,30 +13,8 @@ export default function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const { order, isLoading, errorMessage } = useOrder();
 
-  /*
-  // 테스트용 메뉴 목록
   useEffect(() => {
-    const mockMenus: MenuItem[] = [
-      {
-        id: 1,
-        name: "아메리카노",
-        description: "시원한 아이스 아메리카노",
-        price: 3000,
-      },
-      {
-        id: 2,
-        name: "카페라떼",
-        description: "부드러운 우유 거품의 라떼",
-        price: 4000,
-      },
-    ];
-
-    setMenus(mockMenus);
-  }, []);
-  */  
-
-  useEffect(() => {
-    apiFetch<MenuItem[]>("/api/menus")
+    apiFetch<MenuItem[]>("/menus") 
       .then(setMenus)
       .catch((err) => alert("메뉴 불러오기 실패: " + err.message));
   }, []);

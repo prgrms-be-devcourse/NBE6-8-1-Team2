@@ -12,7 +12,7 @@ export function useSignup() {
     setIsLoading(true); // 로딩 시작
 
     try {
-      await apiFetch("/api/signup", {
+      await apiFetch("/signup", {
         method: "POST",
         body: JSON.stringify(form),
       });
