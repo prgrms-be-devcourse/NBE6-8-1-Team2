@@ -60,10 +60,10 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*") // 개발 중에는 *로 두되, 배포 시 도메인 제한 권장
-                        .allowedMethods("*")
+                        .allowedOrigins("http://localhost:3000") // 개발 중에는 *로 두되, 배포 시 도메인 제한 권장
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                         .allowedHeaders("*")
-                        .allowCredentials(false);
+                        .allowCredentials(true);
             }
         };
     }
