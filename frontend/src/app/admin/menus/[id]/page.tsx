@@ -50,7 +50,7 @@ export default function EditMenu({ params }: Props) {
       name,
       description,
       price,
-      stockCount,
+      stock_count: stockCount,
     };
 
     try {
