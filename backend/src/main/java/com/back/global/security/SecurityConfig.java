@@ -53,14 +53,14 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS 설정 (필요 시 더 구체화 가능)
+    // CORS 설정
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:3000") // 개발 중에는 *로 두되, 배포 시 도메인 제한 권장
+                        .allowedOrigins("http://localhost:3000")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                         .allowedHeaders("*")
                         .allowCredentials(true);
