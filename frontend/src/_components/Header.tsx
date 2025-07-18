@@ -3,6 +3,7 @@
 import { useAuth } from "@/_hooks/auth-context";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function Header() {
   const router = useRouter();
@@ -22,7 +23,19 @@ export default function Header() {
   return (
     <header className="bg-black text-white px-6 py-4 flex justify-between items-center shadow">
       <h1 className="text-3xl font-title font-bold">Grids & Circles</h1>
-      <nav>
+
+      <nav className="flex items-center gap-6 text-base">
+        {isLoggedIn && (
+          <>
+            <Link href="/order" className="hover:underline">
+              주문하기
+            </Link>
+            <Link href="/mypage" className="hover:underline">
+              내 주문 내역
+            </Link>
+          </>
+        )}
+
         {isLoggedIn ? (
           <button
             onClick={handleLogout}
