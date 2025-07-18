@@ -129,7 +129,7 @@ export default function Menus() {
     }
   };
 
-  if (loading) return <p>로딩 중입니다...</p>;
+  if (loading) return <p className="text-center mt-10">로딩 중입니다...</p>;
 
   return (
     <div>

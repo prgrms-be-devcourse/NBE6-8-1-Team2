@@ -27,7 +27,7 @@ export function useLogin() {
     }
 
     try {
-      const res = await apiFetch<{ token: string }>("/api/login", {
+      const res = await apiFetch<{ token: string }>("/login", {
         method: "POST",
         body: JSON.stringify(form),
       });
