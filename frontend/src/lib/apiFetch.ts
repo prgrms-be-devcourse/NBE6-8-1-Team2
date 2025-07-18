@@ -2,7 +2,7 @@ export async function apiFetch<T>(
     path: string,
     options: RequestInit = {}
   ): Promise<T> {
-    const baseUrl = "http://localhost:8080"; // 나중에 환경 변수로 변경
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
   
     const token = localStorage.getItem("accessToken");
   
