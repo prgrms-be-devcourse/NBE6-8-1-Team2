@@ -1,25 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useAuth } from "@/_hooks/auth-context";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "react-toastify";
 
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    setIsLoggedIn(!!token);
-  }, []);
+  const { isLoggedIn, logout } = useAuth();
 
-  // 로그인/회원가입 페이지에서는 헤더 숨김
+  // 회원가입, 로그인 페이지에서는 헤더 숨김
   if (pathname === "/login" || pathname === "/signup") return null;
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    setIsLoggedIn(false);
+    logout(); // 상태 초기화 + 토큰 제거
     toast.success("로그아웃 되었습니다.");
     router.push("/login");
   };

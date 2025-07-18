@@ -31,11 +31,11 @@ public class Order extends BaseEntity {
 
     // 주문에 포함된 메뉴 리스트
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderMenu> orderMenus = new ArrayList<>();
+    private List<OrderMenu> orderItems = new ArrayList<>();
 
     // 주문 메뉴 추가
     public void addOrderMenu(OrderMenu orderMenu) {
-        orderMenus.add(orderMenu);
+        orderItems.add(orderMenu);
         orderMenu.setOrder(this);
     }
 

@@ -7,16 +7,19 @@ import { useOrder } from "@/_hooks/useOrder";
 import { MenuCard } from "@/_components/order/MenuCard";
 import { CartItemCard } from "@/_components/order/CartItemCard";
 import { ErrorMessage } from "@/_components/ui/ErrorMessage";
+import { useAuth } from "@/_hooks/auth-context";
+import { toast } from "react-toastify";
 
 export default function OrderPage() {
   const [menus, setMenus] = useState<MenuItem[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const { order, isLoading, errorMessage } = useOrder();
+  const { isLoggedIn } = useAuth(); 
 
   useEffect(() => {
-    apiFetch<MenuItem[]>("/menus") 
+    apiFetch<MenuItem[]>("/menus")
       .then(setMenus)
-      .catch((err) => alert("메뉴 불러오기 실패: " + err.message));
+      .catch((err) => toast.error("메뉴 불러오기 실패: " + err.message));
   }, []);
 
   const handleAddToCart = useCallback((menu: MenuItem) => {
@@ -59,8 +62,17 @@ export default function OrderPage() {
   }, []);
 
   const handleOrder = () => {
-    order(cart);
+    if (!isLoggedIn) {
+      toast.error("로그인 후 결제할 수 있습니다.");
+      return;
+    }
+    order(cart); // useOrder 훅에서 POST + 이동 처리
   };
+
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + item.menu.price * item.quantity,
+    0
+  );
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-white">
@@ -68,7 +80,7 @@ export default function OrderPage() {
       <div className="w-full lg:w-2/3 p-6">
         <h1 className="text-2xl font-bold mb-6">주문</h1>
 
-        {/* 카테고리 */}
+        {/* 카테고리 (더미) */}
         <div className="flex gap-2 mb-6">
           {["커피", "음료", "디저트", "샌드위치", "기타"].map((cat, idx) => (
             <button
@@ -80,7 +92,7 @@ export default function OrderPage() {
           ))}
         </div>
 
-        {/* 메뉴 카드 */}
+        {/* 메뉴 카드 리스트 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {menus.map((menu) => (
             <MenuCard key={menu.id} menu={menu} onAdd={() => handleAddToCart(menu)} />
@@ -110,21 +122,29 @@ export default function OrderPage() {
 
         {/* 총 금액 */}
         <p className="mt-6 text-right font-semibold text-lg">
-          총 결제 금액 : ₩
-          {cart
-            .reduce((sum, item) => sum + item.menu.price * item.quantity, 0)
-            .toLocaleString()}
+          총 결제 금액 : ₩{totalPrice.toLocaleString()}
         </p>
 
         {/* 결제 버튼 */}
         <button
           type="button"
           onClick={handleOrder}
-          disabled={isLoading}
-          className="mt-4 w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-900 transition"
+          disabled={isLoading || !isLoggedIn}
+          className={`mt-4 w-full font-semibold py-3 rounded transition ${
+            isLoggedIn
+              ? "bg-black text-white hover:bg-gray-900"
+              : "bg-gray-400 text-white cursor-not-allowed"
+          }`}
         >
           {isLoading ? "결제 처리 중..." : "결제하기"}
         </button>
+
+        {/* 로그인 안내 */}
+        {!isLoggedIn && (
+          <p className="mt-2 text-sm text-red-500 text-center">
+            로그인 후 결제할 수 있습니다.
+          </p>
+        )}
 
         <ErrorMessage message={errorMessage} />
       </div>

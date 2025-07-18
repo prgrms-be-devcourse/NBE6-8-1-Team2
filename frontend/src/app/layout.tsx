@@ -1,6 +1,7 @@
 import { Montserrat, Inter } from "next/font/google";
 import Header from "@/_components/Header";
 import { ToastContainer } from "react-toastify";
+import { AuthProvider } from "@/_hooks/auth-context";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
@@ -23,24 +24,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="ko">
       <body className={`${inter.variable} ${montserrat.variable} font-sans antialiased`}>
-      <Header /> 
+        <AuthProvider>
+          <Header />
 
-        {/* 전역 토스트 컨테이너 */}
-        <ToastContainer
-          position="top-center"
-          autoClose={2000}
-          hideProgressBar
-          pauseOnHover
-          closeOnClick
-          theme="light"
-        />
+          {/* 전역 토스트 컨테이너 */}
+          <ToastContainer
+            position="top-center"
+            autoClose={2000}
+            hideProgressBar
+            pauseOnHover
+            closeOnClick
+            theme="light"
+          />
 
-        {/* 페이지 콘텐츠 */}
-        {children}
+          {/* 페이지 콘텐츠 */}
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
