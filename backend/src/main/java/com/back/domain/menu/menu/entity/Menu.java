@@ -14,12 +14,14 @@ public class Menu extends BaseEntity {
     private String description;
     private int price;
     private int stock_count;
+    private String category;
 
-    public Menu(String name, String description, int price, int stock_count) {
+    public Menu(String name, String description, int price, int stock_count, String category) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock_count = stock_count;
+        this.category = category;
     }
 
     public void update(MenuDto dto){

@@ -4,6 +4,7 @@ import com.back.domain.member.member.dto.MemberDto;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
 import com.back.global.exception.ServiceException;
+import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+    private final Rq rq;
 
 
     record MemberJoinReqBody(
@@ -82,7 +84,9 @@ public class MemberController {
     ) {}
 
     record MemberLoginResBody(
-            MemberDto item
+            MemberDto item,
+            String apiKey,
+            String accessToken
     ) {}
 
     @PostMapping("/login")
@@ -101,11 +105,16 @@ public class MemberController {
 
         String accessToken = memberService.genAccessToken(member);
 
+        rq.setCookie("apiKey", member.getApiKey());
+        rq.setCookie("accessToken", accessToken);
+
         return new RsData<>(
                 "200-1",
                 "%s님 환영합니다.".formatted(member.getEmail()),
                 new MemberLoginResBody(
-                        new MemberDto(member)
+                        new MemberDto(member),
+                        member.getApiKey(),
+                        accessToken
                 )
         );
     }

@@ -7,9 +7,10 @@ public record MenuDto(
         @NotBlank String name,
         String description,
         @Min(0) int price,
-        @Min(0) int stock_count
+        @Min(0) int stock_count,
+        String category
 ) {
     public Menu toEntity() {
-        return new Menu(name, description, price, stock_count);
+        return new Menu(name, description, price, stock_count, category);
     }
 }
