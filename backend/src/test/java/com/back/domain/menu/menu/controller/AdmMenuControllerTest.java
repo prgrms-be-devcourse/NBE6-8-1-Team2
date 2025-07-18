@@ -39,7 +39,7 @@ public class AdmMenuControllerTest {
     @BeforeEach
     void setup() {
         // 테스트용 메뉴 미리 저장
-        Menu menu = new Menu("아메리카노", "기본 아메리카노", 3000, 100);
+        Menu menu = new Menu("아메리카노", "기본 아메리카노", 3000, 100, "커피");
         savedMenu = menuRepository.save(menu);
     }
 
@@ -129,7 +129,7 @@ public class AdmMenuControllerTest {
     @WithMockUser(username = "adminUser", roles = {"ADMIN"})
     void t5() throws Exception {
 
-        Menu menu2 = new Menu("라떼", "부드러운 우유 커피", 4000, 80);
+        Menu menu2 = new Menu("라떼", "부드러운 우유 커피", 4000, 80, "커피");
         menuRepository.save(menu2);
 
         mockMvc.perform(get("/admin/menus")
