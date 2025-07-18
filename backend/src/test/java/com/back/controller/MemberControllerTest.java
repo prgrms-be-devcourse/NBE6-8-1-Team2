@@ -51,7 +51,7 @@ public class MemberControllerTest {
                 .andExpect(handler().handlerType(MemberController.class))
                 .andExpect(handler().methodName("join"))
 //                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.resultCode").value("200-1"))
+                .andExpect(jsonPath("$.resultCode").value("201-1"))
                 .andExpect(jsonPath("$.msg").value("%s님 환영합니다. 회원가입이 완료되었습니다.".formatted(member.getEmail())))
                 .andExpect(jsonPath("$.data").exists())
                 .andExpect(jsonPath("$.data.email").value(member.getEmail()))
@@ -87,5 +87,5 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.data.item.email").value(member.getEmail()))
                 .andExpect(jsonPath("$.data.item.nickname").value(member.getNickname()))
                 .andExpect(jsonPath("$.data.item.address").value(member.getAddress()));
-                }
+    }
 }
