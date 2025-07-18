@@ -96,7 +96,7 @@ public class OrderController {
 
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")
-    public List<AdminOrderResponseDto> getAllOrders(@RequestParam int memberId // 추후 수정 예정
+    public List<AdminOrderResponseDto> AdminGetAllOrders(@RequestParam int memberId // 추후 수정 예정
                                                     // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
@@ -106,7 +106,7 @@ public class OrderController {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
 
-        return orderService.getAllOrders();
+        return orderService.AdminGetAllOrders();
     }
 
     private final MemberRepository memberRepository;

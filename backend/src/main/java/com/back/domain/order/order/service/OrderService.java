@@ -142,7 +142,7 @@ public class OrderService {
 
 
     // 전체 주문 목록 조회 (관리자)
-    public List<AdminOrderResponseDto> getAllOrders() {
+    public List<AdminOrderResponseDto> AdminGetAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
         return orders.stream()
