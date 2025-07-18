@@ -176,7 +176,7 @@ export default function Menus() {
                   {/* 삭제 버튼 */}
                   <button
                     onClick={() => handleDeleteMenu(menu.id)}
-                    className="px-2 py-1 bg-gray-500 text-white hover:bg-gray-400"
+                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400"
                   >
                     삭제
                   </button>
