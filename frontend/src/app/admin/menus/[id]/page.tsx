@@ -24,7 +24,7 @@ export default function EditMenu({ params }: Props) {
     try {
       const res = await apiFetch(`/admin/menus/${menuId}`);
       // 응답에서 data 필드를 통해 메뉴 정보 가져오기
-      const menuData = res.data; 
+      const menuData = res.data;
 
       setName(menuData.name);
       setDescription(menuData.description);
@@ -50,7 +50,7 @@ export default function EditMenu({ params }: Props) {
       name,
       description,
       price,
-      stockCount,
+      stock_count: stockCount,
     };
 
     try {
@@ -61,7 +61,7 @@ export default function EditMenu({ params }: Props) {
       });
 
       alert(
-        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${res.name}\n- 설명: ${res.description}\n- 가격: ${res.price}원\n- 재고: ${res.stock_count}개`
+        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${res.data.name}\n- 설명: ${res.data.description}\n- 가격: ${res.data.price}원\n- 재고: ${res.data.stock_count}개`
       );
 
       router.push("/admin/menus"); // 수정 후 목록으로 이동
