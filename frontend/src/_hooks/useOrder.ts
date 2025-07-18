@@ -27,9 +27,9 @@ export function useOrder() {
     setState({ ...state, errorMessage: "", isLoading: true });
 
     try {
-      await apiFetch("/api/orders", {
+      await apiFetch("/orders", {
         method: "POST",
-        body: JSON.stringify({ items }),
+        body: JSON.stringify({ orderMenus: items }),
       });
 
       toast.success("주문이 완료되었습니다.");
