@@ -18,6 +18,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthTokenService authTokenService;
 
     public Member join(String email, String password, String nickname, String address) {
         Member member = new Member(email, password, nickname, address);
@@ -41,12 +42,12 @@ public class MemberService {
     }
 
     public void checkPassword(Member member, String password) {
-        if(!passwordEncoder.matches(password, member.getPassword())) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
         }
     }
 
     public String genAccessToken(Member member) {
-        return null;
+        return authTokenService.genAccessToken(member);
     }
 }
