@@ -7,7 +7,8 @@ public record MenuResponseDto(
         String name,
         String description,
         int price,
-        int stock_count
+        int stock_count,
+        String category
 ) {
     public static MenuResponseDto from(Menu menu) {
         return new MenuResponseDto(
@@ -15,7 +16,8 @@ public record MenuResponseDto(
                 menu.getName(),
                 menu.getDescription(),
                 menu.getPrice(),
-                menu.getStock_count()
+                menu.getStock_count(),
+                menu.getCategory()
         );
     }
 }
