@@ -4,11 +4,21 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       {/* 사이드바 */}
-      <aside className="w-60 bg-gray-800 text-white p-4">
-        <h2 className="text-xl font-bold mb-4">관리자 메뉴</h2>
-        <nav className="flex flex-col gap-2">
-          <a href="/admin/orders" className="hover:underline">주문 관리</a>
-          <a href="/admin/menus" className="hover:underline">메뉴 관리</a>
+      <aside className="w-60 bg-black text-center text-white p-4">
+        <h2 className="text-2xl font-bold mb-10">관리자 메뉴</h2>
+        <nav className="flex flex-col gap-2 text-xl">
+          <a
+            href="/admin/orders"
+            className="mb-2 px-4 py-2 hover:bg-neutral-800 transition-colors"
+          >
+            주문 관리
+          </a>
+          <a
+            href="/admin/menus"
+            className="mb-2 px-4 py-2 hover:bg-neutral-800 transition-colors"
+          >
+            메뉴 관리
+          </a>
         </nav>
       </aside>
 
