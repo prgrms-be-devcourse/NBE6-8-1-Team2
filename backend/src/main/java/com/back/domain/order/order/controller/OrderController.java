@@ -96,7 +96,7 @@ public class OrderController {
 
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")
-    public List<AdminOrderResponseDto> AdminGetAllOrders(@RequestParam int memberId // 추후 수정 예정
+    public List<AdminOrderResponseDto> adminGetAllOrders(@RequestParam int memberId // 추후 수정 예정
                                                     // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
@@ -106,7 +106,25 @@ public class OrderController {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
 
-        return orderService.AdminGetAllOrders();
+        return orderService.adminGetAllOrders();
+    }
+
+    @DeleteMapping("/admin/orders/{orderId}")
+    @Operation(summary = "관리자 주문 삭제")
+    public String adminDeleteOrder(
+            @PathVariable int orderId,
+            @RequestParam int memberId // 추후 수정 예정
+            // @AuthenticationPrincipal User user
+    ) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
+        if (member.getRole() != Role.ADMIN) {
+            throw new IllegalStateException("관리자만 접근 가능합니다.");
+        }
+
+        orderService.deleteOrder(orderId, member);
+        return "주문 삭제 완료";
     }
 
     private final MemberRepository memberRepository;

@@ -91,7 +91,6 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-
     // 내 주문목록
     public List<OrderResponseDto> getMyOrders(Member member) {
         List<Order> orders = orderRepository.findByMember(member);
@@ -140,7 +139,7 @@ public class OrderService {
 
 
     // 전체 주문 목록 조회 (관리자)
-    public List<AdminOrderResponseDto> AdminGetAllOrders() {
+    public List<AdminOrderResponseDto> adminGetAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
         return orders.stream()
