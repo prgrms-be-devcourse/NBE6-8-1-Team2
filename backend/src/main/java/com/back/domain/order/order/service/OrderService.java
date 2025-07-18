@@ -24,10 +24,8 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
 
-    // 사용자 검증을 포함한 메뉴 조회
-    public List<MenuResponseDto> getAllMenus(int memberId) {
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("로그인/회원가입 후 진행 해 주세요" ));
+    // 메뉴 조회
+    public List<MenuResponseDto> getAllMenus() {
         return menuRepository.findAll().stream()
                 .map(MenuResponseDto::from)
                 .toList();

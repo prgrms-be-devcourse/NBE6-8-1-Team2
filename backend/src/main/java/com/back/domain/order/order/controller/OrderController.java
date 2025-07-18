@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping
 @Tag(name = "OrderAPI", description = "관리자 및 사용자가 사용하는 주문 CRUD API")
+// @SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final OrderService orderService;
@@ -29,10 +30,8 @@ public class OrderController {
      */
     @GetMapping("/menus")
     @Operation(summary = "메뉴 목록 조회")
-    public List<MenuResponseDto> getMenus(@RequestParam int memberId )    // 로그인 한 사람만 조회 가능
-                              // @AuthenticationPrincipal User user 추후 수정예정
-    {
-        return orderService.getAllMenus(memberId);
+    public List<MenuResponseDto> getMenus() {
+        return orderService.getAllMenus();
     }
 
     /*
