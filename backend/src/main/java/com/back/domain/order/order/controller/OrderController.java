@@ -70,7 +70,7 @@ public class OrderController {
 
 
     @GetMapping("/myorder")
-    @Operation(summary = "내 주문 조회 (member id필요)")
+    @Operation(summary = "내 주문 조회 (인증 인가 적용 전 / member id필요)")
     public List<OrderResponseDto> getMyOrders(@RequestParam int memberId // 추후 수정 예정
                                               // @AuthenticationPrincipal User user
     ) {
@@ -81,7 +81,7 @@ public class OrderController {
     }
 
     @GetMapping("/myorder/{orderId}")
-    @Operation(summary = "내 주문 상세 조회")
+    @Operation(summary = "내 주문 상세 조회(orderId 필요)")
     public OrderResponseDto getOrderDetail(
             @PathVariable int orderId,
             @RequestParam int memberId // 추후 수정 예정
