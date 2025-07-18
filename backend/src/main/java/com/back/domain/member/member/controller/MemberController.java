@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
+
 
     record MemberJoinReqBody(
             @NotBlank
@@ -45,6 +47,8 @@ public class MemberController {
     ) {}
 
     @PostMapping("/signup")
+    @Transactional
+    @Operation(summary = "회원가입")
     public RsData<MemberDto> join(
             @Valid @RequestBody MemberJoinReqBody reqBody
     ) {
@@ -66,6 +70,44 @@ public class MemberController {
                 new MemberDto(member)
         );
 
+    }
+    record MemberLoginReqBody(
+            @NotBlank
+            @Size(min=2, max=30)
+            String email,
+
+            @NotBlank
+            @Size(min=2, max=300)
+            String password
+    ) {}
+
+    record MemberLoginResBody(
+            MemberDto item
+    ) {}
+
+    @PostMapping("/login")
+    @Transactional(readOnly = true)
+    @Operation(summary = "로그인")
+    public RsData<MemberLoginResBody> login(
+            @Valid @RequestBody MemberLoginReqBody reqBody
+    ) {
+        Member member = memberService.findByEmail(reqBody.email())
+            .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 아이디입니다."));
+
+        memberService.checkPassword(
+                member,
+                reqBody.password()
+        );
+
+        String accessToken = memberService.genAccessToken(member);
+
+        return new RsData<>(
+                "200-1",
+                "%s님 환영합니다.".formatted(member.getEmail()),
+                new MemberLoginResBody(
+                        new MemberDto(member)
+                )
+        );
     }
 
     @Operation(summary = "유저 조회 (임시)")
