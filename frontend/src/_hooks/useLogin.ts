@@ -4,6 +4,7 @@ import { apiFetch } from "@/lib/apiFetch";
 import { LoginForm } from "@/types";
 import { saveToken } from "@/lib/authService";
 import { toast } from "react-toastify";
+import { useAuth } from "@/_hooks/auth-context";
 
 const validateLoginForm = (form: LoginForm): string | null => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -15,6 +16,7 @@ const validateLoginForm = (form: LoginForm): string | null => {
 export function useLogin() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const { login: authLogin } = useAuth(); 
 
   const login = async (form: LoginForm) => {
     setIsLoading(true);
@@ -33,6 +35,7 @@ export function useLogin() {
       });
 
       saveToken(res.token);
+      authLogin(); // 전역 로그인 상태 true
       toast.success("로그인 성공");
       router.push("/order");
     } catch (err: any) {
