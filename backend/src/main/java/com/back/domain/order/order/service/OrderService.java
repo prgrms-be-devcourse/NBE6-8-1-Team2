@@ -45,18 +45,16 @@ public class OrderService {
             final int quantity = menuDto.quantity();
 
             menu.decreaseStock(quantity);   // 재고 감소
-            // 리팩터링 중
-            int price = menu.getPrice();
-            int subtotal = price * quantity;
+            int subtotal = menu.getPrice() * quantity;
             totalPrice += subtotal;
 
             OrderMenu orderMenu = new OrderMenu();
             orderMenu.setOrder(order);
             orderMenu.setMenu(menu);
             orderMenu.setQuantity(quantity);
-
             order.addOrderMenu(orderMenu);
         }
+
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order저장
 

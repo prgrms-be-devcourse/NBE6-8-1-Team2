@@ -72,7 +72,7 @@ public class OrderController {
     @GetMapping("/myorder")
     @Operation(summary = "내 주문 조회 (인증 인가 적용 전 / member id필요)")
     public List<OrderResponseDto> getMyOrders(@RequestParam int memberId // 추후 수정 예정
-                                              // @AuthenticationPrincipal User user
+                                              // 추후 수정 예정 @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
