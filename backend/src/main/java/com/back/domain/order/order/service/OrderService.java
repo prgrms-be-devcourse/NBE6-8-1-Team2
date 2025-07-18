@@ -32,8 +32,7 @@ public class OrderService {
     }
 
     // 주문 등록
-    public OrderResponseDto createOrder(OrderRequestDto requestDto, int memberId) {
-        final Member member = findMemberById(memberId);
+    public OrderResponseDto createOrder(OrderRequestDto requestDto, Member member) {
         final Order order = new Order();
         order.setMember(member);
 
@@ -55,7 +54,6 @@ public class OrderService {
 
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order저장
-
 
         List<OrderMenuResponseDto> responseMenus = order.getOrderItems().stream()
                 .map(om -> new OrderMenuResponseDto(
