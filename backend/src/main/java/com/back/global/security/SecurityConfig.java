@@ -18,7 +18,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // CSRF 비활성화 (H2 콘솔 + POST 요청 등 테스트용)
+                // CSRF 비활성화 (테스트용)
                 .csrf(csrf -> csrf.disable())
 
                 // CORS 설정
@@ -29,12 +29,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // H2 콘솔은 모두 허용
-
                         .requestMatchers("/h2-console/**").permitAll()
-                        // 테스트용 CORS preflight 요청 허용
-
+                        // 현재 모두 허용
                         .requestMatchers("/**").permitAll()
-                        // 나머지는 인증 필요
+
                         .anyRequest().authenticated()
                 )
 
@@ -45,7 +43,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // CORS 설정 (필요 시 더 구체화 가능)
+    // CORS 설정
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {

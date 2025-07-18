@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping
 @Tag(name = "OrderAPI", description = "관리자 및 사용자가 사용하는 주문 CRUD API")
+// @SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final OrderService orderService;
@@ -29,10 +30,8 @@ public class OrderController {
      */
     @GetMapping("/menus")
     @Operation(summary = "메뉴 목록 조회")
-    public List<MenuResponseDto> getMenus(@RequestParam int memberId )    // 로그인 한 사람만 조회 가능
-                              // @AuthenticationPrincipal User user 추후 수정예정
-    {
-        return orderService.getAllMenus(memberId);
+    public List<MenuResponseDto> getMenus() {
+        return orderService.getAllMenus();
     }
 
     /*
@@ -70,9 +69,9 @@ public class OrderController {
 
 
     @GetMapping("/myorder")
-    @Operation(summary = "내 주문 조회 (member id필요)")
+    @Operation(summary = "내 주문 조회 (인증 인가 적용 전 / member id필요)")
     public List<OrderResponseDto> getMyOrders(@RequestParam int memberId // 추후 수정 예정
-                                              // @AuthenticationPrincipal User user
+                                              // 추후 수정 예정 @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
@@ -81,7 +80,7 @@ public class OrderController {
     }
 
     @GetMapping("/myorder/{orderId}")
-    @Operation(summary = "내 주문 상세 조회")
+    @Operation(summary = "내 주문 상세 조회(orderId 필요)")
     public OrderResponseDto getOrderDetail(
             @PathVariable int orderId,
             @RequestParam int memberId // 추후 수정 예정
@@ -96,7 +95,7 @@ public class OrderController {
 
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")
-    public List<AdminOrderResponseDto> getAllOrders(@RequestParam int memberId // 추후 수정 예정
+    public List<AdminOrderResponseDto> adminGetAllOrders(@RequestParam int memberId // 추후 수정 예정
                                                     // @AuthenticationPrincipal User user
     ) {
         Member member = memberRepository.findById(memberId)
@@ -106,7 +105,25 @@ public class OrderController {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
 
-        return orderService.getAllOrders();
+        return orderService.adminGetAllOrders();
+    }
+
+    @DeleteMapping("/admin/orders/{orderId}")
+    @Operation(summary = "관리자 주문 삭제")
+    public String adminDeleteOrder(
+            @PathVariable int orderId,
+            @RequestParam int memberId // 추후 수정 예정
+            // @AuthenticationPrincipal User user
+    ) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 사용자를 찾을 수 없습니다."));
+
+        if (member.getRole() != Role.ADMIN) {
+            throw new IllegalStateException("관리자만 접근 가능합니다.");
+        }
+
+        orderService.deleteOrder(orderId, member);
+        return "주문 삭제 완료";
     }
 
     private final MemberRepository memberRepository;

@@ -24,10 +24,8 @@ public class OrderService {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
 
-    // 사용자 검증을 포함한 메뉴 조회
-    public List<MenuResponseDto> getAllMenus(int memberId) {
-        memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("로그인/회원가입 후 진행 해 주세요" ));
+    // 메뉴 조회
+    public List<MenuResponseDto> getAllMenus() {
         return menuRepository.findAll().stream()
                 .map(MenuResponseDto::from)
                 .toList();
@@ -40,28 +38,26 @@ public class OrderService {
         order.setMember(member);
 
         int totalPrice = 0;
-        for (OrderMenuDto menuDto : requestDto.getOrderMenus()) {
-            final Menu menu = findMenuById(menuDto.getMenuId());
-            final int quantity = menuDto.getQuantity();
+        for (OrderMenuRequestDto menuDto : requestDto.orderItems()) {
+            final Menu menu = findMenuById(menuDto.menuId());
+            final int quantity = menuDto.quantity();
 
             menu.decreaseStock(quantity);   // 재고 감소
-            // 리팩터링 중
-            int price = menu.getPrice();
-            int subtotal = price * quantity;
+            int subtotal = menu.getPrice() * quantity;
             totalPrice += subtotal;
 
             OrderMenu orderMenu = new OrderMenu();
             orderMenu.setOrder(order);
             orderMenu.setMenu(menu);
             orderMenu.setQuantity(quantity);
-
             order.addOrderMenu(orderMenu);
         }
+
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order저장
 
 
-        List<OrderMenuResponseDto> responseMenus = order.getOrderMenus().stream()
+        List<OrderMenuResponseDto> responseMenus = order.getOrderItems().stream()
                 .map(om -> new OrderMenuResponseDto(
                         om.getMenu().getId(),
                         om.getMenu().getName(),
@@ -93,14 +89,13 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-
     // 내 주문목록
     public List<OrderResponseDto> getMyOrders(Member member) {
         List<Order> orders = orderRepository.findByMember(member);
 
         return orders.stream()
                 .map(order -> {
-                    List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+                    List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
                             .map(om -> new OrderMenuResponseDto(
                                     om.getMenu().getId(),
                                     om.getMenu().getName(),
@@ -129,7 +124,7 @@ public class OrderService {
             throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
         }
 
-        List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+        List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
                 .map(om -> new OrderMenuResponseDto(
                         om.getMenu().getId(),
                         om.getMenu().getName(),
@@ -142,13 +137,12 @@ public class OrderService {
 
 
     // 전체 주문 목록 조회 (관리자)
-
-    public List<AdminOrderResponseDto> getAllOrders() {
+    public List<AdminOrderResponseDto> adminGetAllOrders() {
         List<Order> orders = orderRepository.findAll();
 
         return orders.stream()
                 .map(order -> {
-                    List<OrderMenuResponseDto> menuResponses = order.getOrderMenus().stream()
+                    List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
                             .map(om -> new OrderMenuResponseDto(
                                     om.getMenu().getId(),
                                     om.getMenu().getName(),
@@ -165,7 +159,6 @@ public class OrderService {
                             menuResponses
                     );
                 }).toList();
-
     }
 
     // Member 존재 확인
