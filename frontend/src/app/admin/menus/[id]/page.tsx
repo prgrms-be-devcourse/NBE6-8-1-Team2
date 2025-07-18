@@ -77,7 +77,7 @@ export default function EditMenu({ params }: Props) {
     }
   };
 
-  if (loading) return <p>로딩 중입니다...</p>;
+  if (loading) return <p className="text-center mt-10">로딩 중입니다...</p>;
 
   return (
     <div className="px-4 w-full flex justify-center">
@@ -86,10 +86,10 @@ export default function EditMenu({ params }: Props) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block font-semibold">메뉴 이름</label>
+            <label className="block text-lg font-semibold">메뉴 이름</label>
             <input
               type="text"
-              className="w-full border p-2 rounded"
+              className="w-full border p-2"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="메뉴 이름을 입력하세요"
@@ -97,9 +97,9 @@ export default function EditMenu({ params }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold">설명</label>
+            <label className="block text-lg font-semibold">설명</label>
             <textarea
-              className="w-full border p-2 rounded"
+              className="w-full border p-2"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="메뉴 설명을 입력하세요"
@@ -107,10 +107,10 @@ export default function EditMenu({ params }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold">가격</label>
+            <label className="block text-lg font-semibold">가격</label>
             <input
               type="number"
-              className="w-full border p-2 rounded"
+              className="w-full border p-2"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
               placeholder="가격을 입력하세요"
@@ -118,10 +118,10 @@ export default function EditMenu({ params }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold">재고</label>
+            <label className="block text-lg font-semibold">재고</label>
             <input
               type="number"
-              className="w-full border p-2 rounded"
+              className="w-full border p-2"
               value={stockCount}
               onChange={(e) => setStockCount(Number(e.target.value))}
               placeholder="재고 수량을 입력하세요"
@@ -134,7 +134,7 @@ export default function EditMenu({ params }: Props) {
             <button
               type="button"
               onClick={() => router.push("/admin/menus")}
-              className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+              className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
             >
               취소
             </button>
@@ -142,7 +142,7 @@ export default function EditMenu({ params }: Props) {
             {/* 수정 버튼 */}
             <button
               type="submit"
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
             >
               수정하기
             </button>

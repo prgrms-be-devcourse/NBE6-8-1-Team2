@@ -5,12 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSignup } from "@/_hooks/useSignup";
 import { SignupForm } from "@/types";
 import { InputField } from "@/_components/ui/InputField";
-import { Button } from "@/_components/ui/Button";
-import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { signup, isLoading, errorMessage } = useSignup();
+  const { signup, isLoading } = useSignup();
   const [form, setForm] = useState<SignupForm>({
     email: "",
     password: "",
@@ -24,8 +22,10 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signup(form);
-    if (!isLoading && !errorMessage) router.push("/login");
+    const success = await signup(form);
+
+    if (!success) return; 
+    router.push("/login");
   };
 
   return (
@@ -70,8 +70,6 @@ export default function SignupPage() {
           >
             {isLoading ? "회원가입 중..." : "회원가입"}
           </button>
-  
-          <ErrorMessage message={errorMessage} />
         </form>
       </div>
     </div>

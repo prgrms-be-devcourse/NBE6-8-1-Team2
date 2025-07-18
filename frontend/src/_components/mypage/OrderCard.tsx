@@ -15,10 +15,15 @@ export function OrderCard({ order }: { order: Order }) {
 
       {/* 주문 항목 */}
       {order.orderItems.map((item, idx) => (
-        <div key={idx} className="flex justify-between items-center text-base font-semibold">
-          <span>{item.name} X {item.quantity}</span>
-          <div className="flex-1 border-t border-dashed mx-3 mt-2" />
-          <span>₩{item.price.toLocaleString()}</span>
+        <div key={idx} className="flex items-center text-base font-semibold">
+          {/* 메뉴명 + 수량 */}
+          <span className="whitespace-nowrap">{item.name} X {item.quantity}</span>
+
+          {/* 가운데 점선 */}
+          <div className="flex-1 border-t border-dotted border-gray-500 mx-3" />
+
+          {/* 가격 */}
+          <span className="whitespace-nowrap">₩{item.price.toLocaleString()}</span>
         </div>
       ))}
 

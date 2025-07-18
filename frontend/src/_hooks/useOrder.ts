@@ -29,7 +29,7 @@ export function useOrder() {
     try {
       await apiFetch("/orders", {
         method: "POST",
-        body: JSON.stringify({ orderMenus: items }),
+        body: JSON.stringify({ orderItems: items }),
       });
 
       toast.success("주문이 완료되었습니다.");
