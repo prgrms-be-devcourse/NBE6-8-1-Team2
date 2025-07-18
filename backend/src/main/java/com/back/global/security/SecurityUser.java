@@ -14,7 +14,7 @@ public class SecurityUser extends User {
     @Getter
     private String address;
 
-    public SecurityUser(String email, String nickname, String password, Collection<? extends GrantedAuthority> authorities) {
+    public SecurityUser(String email, String nickname, String address, String password, Collection<? extends GrantedAuthority> authorities) {
         super(email, password, authorities);
         this.email = email;
         this.nickname = nickname;
