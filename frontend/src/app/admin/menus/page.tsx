@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu } from "@/types";  // 공용 타입 사용
+import { apiFetch } from "@/lib/apiFetch";
 
 export default function Menus() {
   const router = useRouter();
@@ -19,51 +20,23 @@ export default function Menus() {
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
 
-  // ✅ 더미 데이터 (백엔드 API 안될 때 테스트용)
-  const dummyMenus: Menu[] = [
-    {
-      id: 1,
-      name: "아메리카노",
-      description: "진한 에스프레소와 물의 조화",
-      price: 4500,
-      stockCount: 20,
-    },
-    {
-      id: 2,
-      name: "카페라떼",
-      description: "부드러운 우유와 에스프레소",
-      price: 5000,
-      stockCount: 15,
-    },
-    {
-      id: 3,
-      name: "카푸치노",
-      description: "풍부한 거품과 진한 커피",
-      price: 5500,
-      stockCount: 10,
-    },
-  ];
-
-  // 메뉴 목록 불러오기
   const fetchMenus = async () => {
     try {
-      const res = await fetch("http://localhost:8080/admin/menus");
-      if (!res.ok) throw new Error("메뉴 목록 불러오기 실패");
+      const res = await apiFetch("/admin/menus");
+      const data = res.data || res;
 
-      const rawData = await res.json();
-
-      const data: Menu[] = rawData.map((menu: any) => ({
+      const formattedMenus: Menu[] = data.map((menu: any) => ({
         id: menu.id,
         name: menu.name,
         description: menu.description,
         price: menu.price,
-        stockCount: menu.stock_count,
+        stockCount: menu.stock_count, // snake_case → camelCase
       }));
 
-      setMenus(data);
+      setMenus(formattedMenus);
     } catch (error) {
-      console.error("API 호출 실패 → 더미 데이터 사용", error);
-      setMenus(dummyMenus); // ✅ API 실패 시 fallback
+      console.error("메뉴 목록 불러오기 실패", error);
+      alert("메뉴 데이터를 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -81,29 +54,30 @@ export default function Menus() {
   const handleCreateMenu = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newMenu = { name, description, price, stockCount };
-
     try {
-      const res = await fetch("http://localhost:8080/admin/addmenu", {
+      await apiFetch("/admin/addmenu", {
         method: "POST",
+        body: JSON.stringify({
+          name,
+          description,
+          price,
+          stockCount,
+        }),
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newMenu),
       });
-
-      if (!res.ok) throw new Error("메뉴 등록 실패");
 
       alert("메뉴가 등록되었습니다.");
       closeModal(); // 모달 닫기
       fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
-      console.error(error);
+      console.error("메뉴 등록 실패", error);
       alert("메뉴를 등록하는 중 오류가 발생했습니다.");
     }
   };
 
   // 수정 버튼 → 수정 페이지 이동
   const handleEditMenu = (id: number) => {
-    router.push(`/admin/menus/${id}`); 
+    router.push(`/admin/menus/${id}`);
   };
 
   // 삭제 버튼 → 확인하고 API 호출 후 응답 메시지 출력
@@ -112,19 +86,15 @@ export default function Menus() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:8080/admin/menus/${id}`, {
+      const result = await apiFetch(`/admin/menus/${id}`, {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error("삭제 실패");
-
-      // 백엔드 응답 메시지를 alert로 그대로 보여주기
-      const result = await res.json();
-      alert(result.message);
-      
+      // 응답에서 `msg`를 사용하여 알림 표시
+      alert(result.message || "메뉴가 삭제되었습니다.");
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
-      console.error(error);
+      console.error("메뉴 삭제 실패", error);
       alert("메뉴를 삭제하는 중 오류가 발생했습니다.");
     }
   };
