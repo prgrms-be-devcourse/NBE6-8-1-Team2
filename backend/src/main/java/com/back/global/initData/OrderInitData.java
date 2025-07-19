@@ -21,11 +21,19 @@ public class OrderInitData {
     private final MenuRepository menuRepository;
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 기본 입력 데이터입니다.
+
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void init() {
+        // 중복 체크: 이미 admin 계정이 있으면 초기화 하지 않음
+        if (memberRepository.findByEmail("admin1@test.com").isPresent()) {
+            System.out.println("초기 데이터가 이미 존재합니다. 스킵합니다.");
+            return;
+        }
+
         // 1. 메뉴 등록
         Menu americano = menuRepository.save(new Menu("아메리카노", "아메리카노 입니다", 3000, 200, "커피"));
         Menu latte = menuRepository.save(new Menu("카페라떼", "카페라떼입니다", 4000, 200, "커피"));
@@ -33,23 +41,20 @@ public class OrderInitData {
         Menu vanillaLatte = menuRepository.save(new Menu("바닐라라떼", "향긋한 바닐라 시럽이 들어간 라떼입니다", 4500, 180, "커피"));
         Menu espresso = menuRepository.save(new Menu("에스프레소", "진한 원두의 향을 즐길 수 있는 에스프레소입니다", 2500, 100, "커피"));
 
-
         // 2. 사용자 등록
-        Member user = new Member("admin1@test.com", passwordEncoder.encode("123456"), "admin1", "서울시 어드민 주소", Role.ADMIN);
-        memberRepository.save(user);
+        Member user1 = new Member("admin1@test.com", passwordEncoder.encode("123456"), "admin1", "서울시 어드민 주소", Role.ADMIN);
+        Member user2 = new Member("user1@test.com", passwordEncoder.encode("123456"), "user1", "서울시 강남구");
+        Member user3 = new Member("user2@test.com", passwordEncoder.encode("123456"), "user2", "서울시 마포구");
+        Member user4 = new Member("user3@test.com", passwordEncoder.encode("123456"), "user3", "서울시 성동구");
 
-        user = new Member("user1@test.com", passwordEncoder.encode("123456"), "user1", "서울시 강남구");
-        memberRepository.save(user);
+        memberRepository.save(user1);
+        memberRepository.save(user2);
+        memberRepository.save(user3);
+        memberRepository.save(user4);
 
-        user = new Member("user2@test.com", passwordEncoder.encode("123456"), "user2", "서울시 마포구");
-        memberRepository.save(user);
-
-        user = new Member("user3@test.com", passwordEncoder.encode("123456"), "user3", "서울시 성동구");
-        memberRepository.save(user);
-
-        // 3. 주문 등록
+        // 3. 주문 등록 (user4의 주문)
         Order order = new Order();
-        order.setMember(user);
+        order.setMember(user4);
 
         OrderMenu om1 = new OrderMenu();
         om1.setOrder(order);
@@ -63,12 +68,12 @@ public class OrderInitData {
         om2.setQuantity(1);
         order.addOrderMenu(om2);
 
-        int totalPrice = om1.getMenu().getPrice() * om1.getQuantity() + om2.getMenu().getPrice() * om2.getQuantity();
+        int totalPrice = om1.getMenu().getPrice() * om1.getQuantity()
+                + om2.getMenu().getPrice() * om2.getQuantity();
         order.setTotalPrice(totalPrice);
 
         orderRepository.save(order);
 
+        System.out.println("초기 데이터 삽입 완료");
     }
-
-    private final PasswordEncoder passwordEncoder;
 }
