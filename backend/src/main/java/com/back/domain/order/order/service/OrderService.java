@@ -11,6 +11,8 @@ import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,14 +57,7 @@ public class OrderService {
         order.setTotalPrice(totalPrice);
         orderRepository.save(order);    // order 저장
 
-        List<OrderMenuResponseDto> responseMenus = order.getOrderItems().stream()
-                .map(om -> new OrderMenuResponseDto(
-                        om.getMenu().getId(),
-                        om.getMenu().getName(),
-                        om.getQuantity(),
-                        om.getMenu().getPrice()
-                )).toList();
-
+        List<OrderMenuResponseDto> responseMenus = toResponseDtos(order.getOrderItems());
         return new OrderResponseDto(
                 order.getId(),
                 order.getTotalPrice(),
@@ -87,19 +82,12 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
-    // 내 주문목록
-    public List<OrderResponseDto> getMyOrders(Member member) {
-        List<Order> orders = orderRepository.findByMember(member);
+    // 내 주문목록(페이징)
+    public Page<OrderResponseDto> getMyOrders(Member member, Pageable pageable) {
+        Page<Order> orders = orderRepository.findByMember(member, pageable);
 
-        return orders.stream()
-                .map(order -> {
-                    List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
-                            .map(om -> new OrderMenuResponseDto(
-                                    om.getMenu().getId(),
-                                    om.getMenu().getName(),
-                                    om.getQuantity(),
-                                    om.getMenu().getPrice()
-                            )).toList();
+        return orders.map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
 
                     return new OrderResponseDto(
                             order.getId(),
@@ -108,7 +96,7 @@ public class OrderService {
                             menuResponses,
                             member.getEmail()
                     );
-                }).toList();
+                });
     }
 
     // 주문 상세 조회
@@ -122,31 +110,18 @@ public class OrderService {
             throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
         }
 
-        List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
-                .map(om -> new OrderMenuResponseDto(
-                        om.getMenu().getId(),
-                        om.getMenu().getName(),
-                        om.getQuantity(),
-                        om.getMenu().getPrice()
-                )).toList();
+        List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
 
         return new OrderResponseDto(order.getId(), order.getTotalPrice(), order.getCreateDate(), menuResponses, member.getEmail());
     }
 
 
     // 전체 주문 목록 조회 (관리자)
-    public List<AdminOrderResponseDto> adminGetAllOrders() {
-        List<Order> orders = orderRepository.findAll();
+    public Page<AdminOrderResponseDto> adminGetAllOrders(Pageable pageable) {
+        Page<Order> orders = orderRepository.findAll(pageable);
 
-        return orders.stream()
-                .map(order -> {
-                    List<OrderMenuResponseDto> menuResponses = order.getOrderItems().stream()
-                            .map(om -> new OrderMenuResponseDto(
-                                    om.getMenu().getId(),
-                                    om.getMenu().getName(),
-                                    om.getQuantity(),
-                                    om.getMenu().getPrice()
-                            )).toList();
+        return orders.map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
 
                     return new AdminOrderResponseDto(
                             order.getId(),
@@ -156,7 +131,7 @@ public class OrderService {
                             order.getTotalPrice(),
                             menuResponses
                     );
-                }).toList();
+                });
     }
 
     // Member 존재 확인
@@ -171,5 +146,16 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
     }
 
+
+    // OrderMenuResponseDto 변환
+    private List<OrderMenuResponseDto> toResponseDtos(List<OrderMenu> orderItems) {
+        return orderItems.stream()
+                .map(om -> new OrderMenuResponseDto(
+                        om.getMenu().getId(),
+                        om.getMenu().getName(),
+                        om.getQuantity(),
+                        om.getMenu().getPrice()
+                )).toList();
+    }
 
 }
