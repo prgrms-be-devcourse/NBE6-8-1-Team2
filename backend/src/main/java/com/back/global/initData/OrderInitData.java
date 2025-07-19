@@ -8,8 +8,10 @@ import com.back.domain.menu.menu.repository.MenuRepository;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,7 @@ public class OrderInitData {
     private final OrderRepository orderRepository;
 
     // 기본 입력 데이터입니다.
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void init() {
         // 1. 메뉴 등록
@@ -33,16 +35,16 @@ public class OrderInitData {
 
 
         // 2. 사용자 등록
-        Member user = new Member("admin1@example.com", "123456", Role.ADMIN);
+        Member user = new Member("admin1@test.com", passwordEncoder.encode("123456"), "admin1", "서울시 어드민 주소", Role.ADMIN);
         memberRepository.save(user);
 
-        user = new Member("user1@example.com", "123456", "user1", "서울시 강남구");
+        user = new Member("user1@test.com", passwordEncoder.encode("123456"), "user1", "서울시 강남구");
         memberRepository.save(user);
 
-        user = new Member("user2@example.com", "123456", "user2", "서울시 마포구");
+        user = new Member("user2@test.com", passwordEncoder.encode("123456"), "user2", "서울시 마포구");
         memberRepository.save(user);
 
-        user = new Member("user3@example.com", "123456", "user3", "서울시 성동구");
+        user = new Member("user3@test.com", passwordEncoder.encode("123456"), "user3", "서울시 성동구");
         memberRepository.save(user);
 
         // 3. 주문 등록
@@ -67,4 +69,6 @@ public class OrderInitData {
         orderRepository.save(order);
 
     }
+
+    private final PasswordEncoder passwordEncoder;
 }
