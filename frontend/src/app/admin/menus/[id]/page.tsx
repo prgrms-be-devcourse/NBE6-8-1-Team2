@@ -81,7 +81,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">메뉴 이름</label>
             <input
               type="text"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="메뉴 이름을 입력하세요"
@@ -91,7 +91,7 @@ export default function EditMenu({ params }: Props) {
           <div>
             <label className="block text-lg font-semibold">설명</label>
             <textarea
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="메뉴 설명을 입력하세요"
@@ -102,7 +102,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">가격</label>
             <input
               type="number"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
               placeholder="가격을 입력하세요"
@@ -113,7 +113,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">재고</label>
             <input
               type="number"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={stockCount}
               onChange={(e) => setStockCount(Number(e.target.value))}
               placeholder="재고 수량을 입력하세요"
@@ -126,7 +126,7 @@ export default function EditMenu({ params }: Props) {
             <button
               type="button"
               onClick={() => router.push("/admin/menus")}
-              className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
+              className="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded"
             >
               취소
             </button>
@@ -134,7 +134,7 @@ export default function EditMenu({ params }: Props) {
             {/* 수정 버튼 */}
             <button
               type="submit"
-              className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
+              className="px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
             >
               수정하기
             </button>

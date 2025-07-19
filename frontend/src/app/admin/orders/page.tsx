@@ -36,9 +36,9 @@ export default function Orders() {
       <h1 className="text-2xl font-title font-bold mb-6 text-black">
         전체 주문 목록 조회
       </h1>
-      <div className="overflow-x-auto border border-gray-300">
-        <table className="w-full table-auto text-sm text-left text-black bg-white">
-          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12">
+      <div className="overflow-x-auto border border-gray-300 rounded">
+        <table className="w-full table-auto text-sm text-left text-black bg-white rounded">
+          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12 rounded">
             <tr>
               <th className="px-4 py-2 text-center">주문번호</th>
               <th className="px-4 py-2 text-center">주문일시</th>

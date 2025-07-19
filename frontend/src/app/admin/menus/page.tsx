@@ -108,14 +108,14 @@ export default function Menus() {
       {/* 메뉴 등록 버튼 → 모달 열기 */}
       <button
         onClick={openModal}
-        className="mb-4 px-4 py-2 bg-black text-white hover:bg-neutral-800"
+        className="mb-4 px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
       >
         메뉴 등록
       </button>
 
-      <div className="overflow-x-auto border border-gray-300">
-        <table className="w-full table-auto text-sm text-left text-black bg-white">
-          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12 border-b border-gray-300">
+      <div className="overflow-x-auto border border-gray-300 rounded">
+        <table className="w-full table-auto text-sm text-left text-black bg-white rounded">
+          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12 border-b border-gray-300 rounded">
             <tr>
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">이름</th>
@@ -138,7 +138,7 @@ export default function Menus() {
                 <td className="px-4 py-3 text-left space-x-2">
                   {/* 수정 버튼 */}
                   <button
-                    className="px-2 py-1 bg-black text-white hover:bg-neutral-800"
+                    className="px-2 py-1 bg-black text-white hover:bg-neutral-800 rounded"
                     onClick={() => handleEditMenu(menu.id)}
                   >
                     수정
@@ -146,7 +146,7 @@ export default function Menus() {
                   {/* 삭제 버튼 */}
                   <button
                     onClick={() => handleDeleteMenu(menu.id)}
-                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400"
+                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded"
                   >
                     삭제
                   </button>
@@ -160,7 +160,7 @@ export default function Menus() {
       {/* 메뉴 등록 모달 */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 max-w-md w-full">
+          <div className="bg-white p-6 max-w-md w-full rounded">
             <h2 className="text-xl font-bold mb-4">메뉴 등록</h2>
 
             <form onSubmit={handleCreateMenu} className="space-y-4">
@@ -168,7 +168,7 @@ export default function Menus() {
                 <label className="block font-semibold">메뉴 이름</label>
                 <input
                   type="text"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="메뉴 이름을 입력하세요"
@@ -178,7 +178,7 @@ export default function Menus() {
               <div>
                 <label className="block font-semibold">설명</label>
                 <textarea
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="메뉴 설명을 입력하세요"
@@ -189,7 +189,7 @@ export default function Menus() {
                 <label className="block font-semibold">가격</label>
                 <input
                   type="number"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
                   placeholder="가격을 입력하세요"
@@ -200,7 +200,7 @@ export default function Menus() {
                 <label className="block font-semibold">재고</label>
                 <input
                   type="number"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={stockCount}
                   onChange={(e) => setStockCount(Number(e.target.value))}
                   placeholder="재고 수량을 입력하세요"
@@ -211,13 +211,13 @@ export default function Menus() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
+                  className="px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
                 >
                   등록하기
                 </button>
