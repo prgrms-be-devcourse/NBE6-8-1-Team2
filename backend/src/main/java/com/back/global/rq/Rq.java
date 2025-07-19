@@ -19,20 +19,11 @@ public class Rq {
     private final HttpServletResponse resp;
 
     public Member getActor() {
-        return Optional.ofNullable(
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication()
-        )
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
-                .filter(principal -> principal instanceof SecurityUser)
-                .map(principal -> (SecurityUser) principal)
-                .map(securityUser -> new Member(
-                        securityUser.getEmail(), 
-                        securityUser.getPassword(), 
-                        securityUser.getNickname(), 
-                        securityUser.getAddress()
-                ))
+                .filter(SecurityUser.class::isInstance)
+                .map(SecurityUser.class::cast)
+                .map(SecurityUser::getMember)
                 .orElse(null);
     }
 

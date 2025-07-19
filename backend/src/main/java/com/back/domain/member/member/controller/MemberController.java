@@ -8,6 +8,8 @@ import com.back.global.rq.Rq;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -32,21 +34,22 @@ public class MemberController {
 
     record MemberJoinReqBody(
             @NotBlank
-            @Size(min=2, max=30)
+            @Size(min = 2, max = 30)
             String email,
 
             @NotBlank
-            @Size(min=2, max=30)
+            @Size(min = 2, max = 30)
             String password,
 
             @NotBlank
-            @Size(min=2, max=30)
+            @Size(min = 2, max = 30)
             String nickname,
 
             @NotBlank
-            @Size(min=2, max=30)
+            @Size(min = 2, max = 30)
             String address
-    ) {}
+    ) {
+    }
 
     @PostMapping("/signup")
     @Transactional
@@ -73,21 +76,24 @@ public class MemberController {
         );
 
     }
+
     record MemberLoginReqBody(
             @NotBlank
-            @Size(min=2, max=30)
+            @Size(min = 2, max = 30)
             String email,
 
             @NotBlank
-            @Size(min=2, max=300)
+            @Size(min = 2, max = 300)
             String password
-    ) {}
+    ) {
+    }
 
     record MemberLoginResBody(
             MemberDto item,
             String apiKey,
             String accessToken
-    ) {}
+    ) {
+    }
 
     @PostMapping("/login")
     @Transactional(readOnly = true)
@@ -96,7 +102,7 @@ public class MemberController {
             @Valid @RequestBody MemberLoginReqBody reqBody
     ) {
         Member member = memberService.findByEmail(reqBody.email())
-            .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 아이디입니다."));
+                .orElseThrow(() -> new ServiceException("401-1", "존재하지 않는 아이디입니다."));
 
         memberService.checkPassword(
                 member,
@@ -119,24 +125,31 @@ public class MemberController {
         );
     }
 
-    @Operation(summary = "유저 조회 (임시)")
-    @GetMapping("/{id}")
-    public ResponseEntity<Member> getById(@PathVariable int id) {
-        return memberService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "인증된 사용자 정보 조회")
+    @GetMapping("/auth/me")
+    public ResponseEntity<?> getAuthenticatedUser() {
+        Member actor = rq.getActor();
+
+        if (actor == null) {
+            return ResponseEntity.status(401).body("로그인 상태가 아닙니다."); // 인증되지 않은 사용자에 대한 처리 (오류X)
+        }
+
+        return ResponseEntity.ok(new MemberDto(actor));
     }
 
-    @Operation(summary = "모든 유저 조회 (임시)")
-    @GetMapping
-    public ResponseEntity<List<Member>> getAll() {
-        return ResponseEntity.ok(memberService.findAll());
-    }
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // accessToken 쿠키 삭제
+        Cookie cookie = new Cookie("accessToken", "");
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(0); // 즉시 만료
+        cookie.setAttribute("SameSite", "Strict");
 
-    @Operation(summary = "특정 유저 삭제 (임시)")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id) {
-        memberService.deleteById(id);
+        response.addCookie(cookie);
+
         return ResponseEntity.noContent().build();
     }
 }

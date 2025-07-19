@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch";
 import { LoginForm } from "@/types";
-import { saveToken } from "@/lib/authService";
 import { toast } from "react-toastify";
 import { useAuth } from "@/_hooks/auth-context";
 
@@ -29,12 +28,11 @@ export function useLogin() {
     }
 
     try {
-      const res = await apiFetch<{ token: string }>("/login", {
+      await apiFetch("/login", {
         method: "POST",
         body: JSON.stringify(form),
       });
 
-      saveToken(res.token);
       authLogin(); // 전역 로그인 상태 true
       toast.success("로그인 성공");
       router.push("/order");
