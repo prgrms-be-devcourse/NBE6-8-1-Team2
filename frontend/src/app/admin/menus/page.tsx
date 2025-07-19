@@ -58,17 +58,25 @@ export default function Menus() {
     e.preventDefault();
 
     try {
+      const formData = new FormData();
+      
+      const menuData = {
+        name,
+        description,
+        price,
+        stock_count: stockCount,
+        imageUrl,
+        imageName,
+      };
+      
+      // menu part를 JSON blob으로 추가
+      formData.append("menu", new Blob([JSON.stringify(menuData)], {
+        type: "application/json"
+      }));
+
       await apiFetch("/admin/addmenu", {
         method: "POST",
-        body: JSON.stringify({
-          name,
-          description,
-          price,
-          stock_count: stockCount,
-          imageUrl,
-          imageName,
-        }),
-        headers: { "Content-Type": "application/json" },
+        body: formData,
       });
 
       toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
