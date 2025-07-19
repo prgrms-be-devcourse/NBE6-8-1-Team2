@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Order, OrderItem } from "@/types";
 import { apiFetch } from "@/lib/apiFetch";
+import { toast } from "react-toastify";  // toastify 임포트
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -15,7 +16,7 @@ export default function Orders() {
       setOrders(data);
     } catch (error) {
       console.error("주문 목록 불러오기 실패", error);
-      alert("주문 데이터를 불러오는 데 실패했습니다.");
+      toast.error("주문 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
     } finally {
       setLoading(false);
     }

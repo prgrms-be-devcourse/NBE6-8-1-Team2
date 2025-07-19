@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch"; // apiFetch 임포트
+import { toast } from "react-toastify"; // toastify 임포트
 
 type Props = {
   params: { id: string };
@@ -32,7 +33,7 @@ export default function EditMenu({ params }: Props) {
       setStockCount(menuData.stock_count); // snake_case → camelCase로 처리
     } catch (error) {
       console.error(error);
-      alert("메뉴 정보를 불러오는 중 오류가 발생했습니다.");
+      toast.error("메뉴 정보를 불러오는 중 오류가 발생했습니다."); // toastify로 오류 알림
     } finally {
       setLoading(false);
     }
@@ -60,14 +61,11 @@ export default function EditMenu({ params }: Props) {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert(
-        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${res.data.name}\n- 설명: ${res.data.description}\n- 가격: ${res.data.price}원\n- 재고: ${res.data.stock_count}개`
-      );
-
+      toast.success(`메뉴가 수정되었습니다!\n- 이름: ${res.data.name}\n- 가격: ${res.data.price}원`); // 수정 성공 알림
       router.push("/admin/menus"); // 수정 후 목록으로 이동
     } catch (error) {
       console.error(error);
-      alert("메뉴를 수정하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 수정하는 중 오류가 발생했습니다."); // 수정 실패 알림
     }
   };
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu } from "@/types";  // 공용 타입 사용
 import { apiFetch } from "@/lib/apiFetch";
+import { toast } from "react-toastify";  // toastify 임포트
 
 export default function Menus() {
   const router = useRouter();
@@ -36,7 +37,7 @@ export default function Menus() {
       setMenus(formattedMenus);
     } catch (error) {
       console.error("메뉴 목록 불러오기 실패", error);
-      alert("메뉴 데이터를 불러오는 데 실패했습니다.");
+      toast.error("메뉴 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
     } finally {
       setLoading(false);
     }
@@ -66,12 +67,12 @@ export default function Menus() {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert("메뉴가 등록되었습니다.");
+      toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
       closeModal(); // 모달 닫기
       fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
       console.error("메뉴 등록 실패", error);
-      alert("메뉴를 등록하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 등록하는 중 오류가 발생했습니다.");  // 실패 메시지
     }
   };
 
@@ -90,12 +91,11 @@ export default function Menus() {
         method: "DELETE",
       });
 
-      // 응답에서 `msg`를 사용하여 알림 표시
-      alert(result.message || "메뉴가 삭제되었습니다.");
+      toast.success(result.message || "메뉴가 삭제되었습니다.");  // 성공 메시지
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
       console.error("메뉴 삭제 실패", error);
-      alert("메뉴를 삭제하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 삭제하는 중 오류가 발생했습니다.");  // 실패 메시지
     }
   };
 
