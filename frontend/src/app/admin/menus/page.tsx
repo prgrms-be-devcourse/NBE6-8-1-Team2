@@ -20,6 +20,8 @@ export default function Menus() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState("");     // ✅ 추가
+  const [imageName, setImageName] = useState("");   // ✅ 추가
 
   const fetchMenus = async () => {
     try {
@@ -32,6 +34,8 @@ export default function Menus() {
         description: menu.description,
         price: menu.price,
         stockCount: menu.stock_count, // snake_case → camelCase
+        imageUrl: menu.imageUrl,
+        imageName: menu.imageName,
       }));
 
       setMenus(formattedMenus);
@@ -56,18 +60,37 @@ export default function Menus() {
     e.preventDefault();
 
     try {
+      const formData = new FormData();
+      
+      const menuData = {
+        name,
+        description,
+        price,
+        stock_count: stockCount,
+        imageUrl,
+        imageName,
+      };
+      
+      // menu part를 JSON blob으로 추가
+      formData.append("menu", new Blob([JSON.stringify(menuData)], {
+        type: "application/json"
+      }));
+
       await apiFetch("/admin/addmenu", {
         method: "POST",
-        body: JSON.stringify({
-          name,
-          description,
-          price,
-          stock_count: stockCount, // stockCount → stock_count로 수정
-        }),
-        headers: { "Content-Type": "application/json" },
+        body: formData,
       });
 
       toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
+      
+      // 폼 데이터 초기화
+      setName("");
+      setDescription("");
+      setPrice(0);
+      setStockCount(0);
+      setImageUrl("");
+      setImageName("");
+      
       closeModal(); // 모달 닫기
       fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
@@ -118,6 +141,7 @@ export default function Menus() {
           <thead className="bg-black text-white font-bold tracking-wide uppercase h-12 border-b border-gray-300 rounded">
             <tr>
               <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">이미지</th>
               <th className="px-4 py-2 text-left">이름</th>
               <th className="px-4 py-2 text-left">설명</th>
               <th className="px-4 py-2 text-left">가격</th>
@@ -129,6 +153,25 @@ export default function Menus() {
             {menus.map((menu) => (
               <tr key={menu.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3 text-left font-medium">{menu.id}</td>
+                <td className="px-4 py-3 text-left">
+                  {menu.imageUrl ? (
+                    <img 
+                      src={menu.imageUrl} 
+                      alt={menu.imageName || menu.name}
+                      className="w-12 h-12 object-cover rounded"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <span 
+                    className="text-gray-400 text-sm" 
+                    style={{display: menu.imageUrl ? 'none' : 'block'}}
+                  >
+                    이미지 없음
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-left">{menu.name}</td>
                 <td className="px-4 py-3 text-left">{menu.description}</td>
                 <td className="px-4 py-3 text-right">
@@ -192,7 +235,6 @@ export default function Menus() {
                   className="w-full border p-2 rounded"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
-                  placeholder="가격을 입력하세요"
                 />
               </div>
 
@@ -203,7 +245,28 @@ export default function Menus() {
                   className="w-full border p-2 rounded"
                   value={stockCount}
                   onChange={(e) => setStockCount(Number(e.target.value))}
-                  placeholder="재고 수량을 입력하세요"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 URL</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="/images/latte.jpg"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 이름</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageName}
+                  onChange={(e) => setImageName(e.target.value)}
+                  placeholder="latte.jpg"
                 />
               </div>
 
