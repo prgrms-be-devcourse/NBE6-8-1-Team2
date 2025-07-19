@@ -10,6 +10,10 @@ import com.back.global.rq.Rq;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,8 +52,9 @@ public class OrderController {
     // 내 주문 목록 조회
     @GetMapping("/myorder")
     @Operation(summary = "내 주문 조회")
-    public List<OrderResponseDto> getMyOrders() {
-        return orderService.getMyOrders(rq.getActor());
+    public Page<OrderResponseDto> getMyOrders(@PageableDefault(size = 10, page = 0, sort = "createDate", direction = Sort.Direction.DESC)
+                                                  Pageable pageable) {
+        return orderService.getMyOrders(rq.getActor(), pageable);
     }
 
     // 내 주문 상세 조회
@@ -62,11 +67,12 @@ public class OrderController {
     // 관리자 주문 전체 조회
     @GetMapping("/admin/orders")
     @Operation(summary = "관리자 주문 전체 조회")
-    public List<AdminOrderResponseDto> adminGetAllOrders() {
+    public Page<AdminOrderResponseDto> adminGetAllOrders(@PageableDefault(size = 10, page = 0, sort = "createDate", direction = Sort.Direction.DESC)
+    Pageable pageable) {
         if (rq.getActor().getRole() != Role.ADMIN) {
             throw new IllegalStateException("관리자만 접근 가능합니다.");
         }
-        return orderService.adminGetAllOrders();
+        return orderService.adminGetAllOrders(pageable);
     }
 
     // 관리자 주문 삭제
