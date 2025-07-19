@@ -20,6 +20,8 @@ export default function Menus() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState("");     // ✅ 추가
+  const [imageName, setImageName] = useState("");   // ✅ 추가
 
   const fetchMenus = async () => {
     try {
@@ -62,7 +64,9 @@ export default function Menus() {
           name,
           description,
           price,
-          stock_count: stockCount, // stockCount → stock_count로 수정
+          stock_count: stockCount,
+          imageUrl,
+          imageName,
         }),
         headers: { "Content-Type": "application/json" },
       });
@@ -192,7 +196,6 @@ export default function Menus() {
                   className="w-full border p-2 rounded"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
-                  placeholder="가격을 입력하세요"
                 />
               </div>
 
@@ -203,7 +206,28 @@ export default function Menus() {
                   className="w-full border p-2 rounded"
                   value={stockCount}
                   onChange={(e) => setStockCount(Number(e.target.value))}
-                  placeholder="재고 수량을 입력하세요"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 URL</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="/images/latte.jpg"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 이름</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageName}
+                  onChange={(e) => setImageName(e.target.value)}
+                  placeholder="latte.jpg"
                 />
               </div>
 
