@@ -8,7 +8,9 @@ public record MenuDto(
         String description,
         @Min(0) int price,
         @Min(0) int stock_count,
-        String category
+        String category,
+        String imageUrl,
+        String imageName
 ) {
     public Menu toEntity() {
         return new Menu(name, description, price, stock_count, category);
