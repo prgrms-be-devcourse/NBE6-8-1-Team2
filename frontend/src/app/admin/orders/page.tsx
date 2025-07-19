@@ -12,8 +12,8 @@ export default function Orders() {
   const fetchOrders = async () => {
     try {
       const response = await apiFetch<any>("/admin/orders");
-      const data: Order[] = response.data || response; // 백엔드 응답 형태에 따라 조정
-      setOrders(data);
+      const data = response.data || response;; // 백엔드 응답 형태에 따라 조정
+      setOrders(data.content);
     } catch (error) {
       console.error("주문 목록 불러오기 실패", error);
       toast.error("주문 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
