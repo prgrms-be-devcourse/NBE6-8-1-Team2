@@ -52,27 +52,32 @@ public class OrderInitData {
         memberRepository.save(user3);
         memberRepository.save(user4);
 
-        // 3. 주문 등록 (user4의 주문)
-        Order order = new Order();
-        order.setMember(user4);
 
-        OrderMenu om1 = new OrderMenu();
-        om1.setOrder(order);
-        om1.setMenu(americano);
-        om1.setQuantity(2);
-        order.addOrderMenu(om1);
+        // 3. 주문 등록 (admin1의 주문, 25개 (편의를 위해 admin1로 했습니다.))
+        for (int i = 1; i <= 25; i++) {
+            Order order = new Order();
+            order.setMember(user1); // admin1
 
-        OrderMenu om2 = new OrderMenu();
-        om2.setOrder(order);
-        om2.setMenu(latte);
-        om2.setQuantity(1);
-        order.addOrderMenu(om2);
+            OrderMenu om1 = new OrderMenu();
+            om1.setOrder(order);
+            om1.setMenu(americano);
+            om1.setQuantity(i % 3 + 1);
 
-        int totalPrice = om1.getMenu().getPrice() * om1.getQuantity()
-                + om2.getMenu().getPrice() * om2.getQuantity();
-        order.setTotalPrice(totalPrice);
+            OrderMenu om2 = new OrderMenu();
+            om2.setOrder(order);
+            om2.setMenu(latte);
+            om2.setQuantity((i + 1) % 3 + 1);
 
-        orderRepository.save(order);
+            order.addOrderMenu(om1);
+            order.addOrderMenu(om2);
+
+            int totalPrice = om1.getMenu().getPrice() * om1.getQuantity()
+                    + om2.getMenu().getPrice() * om2.getQuantity();
+            order.setTotalPrice(totalPrice);
+
+            orderRepository.save(order);
+        }
+
 
         System.out.println("초기 데이터 삽입 완료");
     }
