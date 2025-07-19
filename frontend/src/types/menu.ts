@@ -11,6 +11,7 @@ export type MenuItem = {
   name: string;
   description: string;
   price: number;
+  category: string;
 };
 
 export type CartItem = {
