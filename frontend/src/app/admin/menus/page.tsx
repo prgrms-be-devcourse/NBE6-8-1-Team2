@@ -80,6 +80,15 @@ export default function Menus() {
       });
 
       toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
+      
+      // 폼 데이터 초기화
+      setName("");
+      setDescription("");
+      setPrice(0);
+      setStockCount(0);
+      setImageUrl("");
+      setImageName("");
+      
       closeModal(); // 모달 닫기
       fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
