@@ -1,47 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Order, OrderItem } from "@/types"; // 공용 타입 사용
+import { Order, OrderItem } from "@/types";
+import { apiFetch } from "@/lib/apiFetch";
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ 테스트용 더미 데이터
-  const dummyOrders: Order[] = [
-    {
-      orderId: 1001,
-      userId: 1,
-      email: "coffee@lover.com",
-      createdAt: "2025-07-16T10:30:00",
-      totalPrice: 18500,
-      orderItems: [
-        { menuId: 1, name: "아메리카노", quantity: 2, price: 5000 },
-        { menuId: 2, name: "카페라떼", quantity: 1, price: 8500 },
-      ],
-    },
-    {
-      orderId: 1002,
-      userId: 2,
-      email: "latte@cafe.com",
-      createdAt: "2025-07-16T11:15:00",
-      totalPrice: 12000,
-      orderItems: [
-        { menuId: 3, name: "카푸치노", quantity: 2, price: 6000 },
-      ],
-    },
-  ];
-
   const fetchOrders = async () => {
     try {
-      const res = await fetch("http://localhost:8080/admin/orders");
-      if (!res.ok) throw new Error("주문 목록 불러오기 실패");
-
-      const data: Order[] = await res.json();
+      const response = await apiFetch<any>("/admin/orders");
+      const data: Order[] = response.data || response; // 백엔드 응답 형태에 따라 조정
       setOrders(data);
     } catch (error) {
-      console.error("API 실패 → 더미 데이터 사용");
-      setOrders(dummyOrders); // ❗ 실패 시 더미데이터 사용
+      console.error("주문 목록 불러오기 실패", error);
+      alert("주문 데이터를 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
     }

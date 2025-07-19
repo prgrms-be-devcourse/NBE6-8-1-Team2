@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -15,6 +17,8 @@ public class Member extends BaseEntity{
     private String nickname;
     private String password;
     private String address;
+    @Column(unique = true)
+    private String apiKey;
 
     // 기존 Role 중복 삭제(태열님 코드로 교체)
     @Enumerated(EnumType.STRING)
@@ -32,5 +36,10 @@ public class Member extends BaseEntity{
         this.password = password;
         this.nickname = nickname;
         this.address = address;
+        this.apiKey = UUID.randomUUID().toString();
+    }
+
+    public void modifyApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

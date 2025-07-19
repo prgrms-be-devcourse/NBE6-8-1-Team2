@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/apiFetch"; // apiFetch 임포트
 
 type Props = {
   params: { id: string };
@@ -21,15 +22,14 @@ export default function EditMenu({ params }: Props) {
   // 메뉴 상세 조회 → 기존 데이터 불러오기
   const fetchMenu = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/admin/menus/${menuId}`);
-      if (!res.ok) throw new Error("메뉴 불러오기 실패");
+      const res = await apiFetch(`/admin/menus/${menuId}`);
+      // 응답에서 data 필드를 통해 메뉴 정보 가져오기
+      const menuData = res.data;
 
-      const data = await res.json();
-
-      setName(data.name);
-      setDescription(data.description);
-      setPrice(data.price);
-      setStockCount(data.stock_count);
+      setName(menuData.name);
+      setDescription(menuData.description);
+      setPrice(menuData.price);
+      setStockCount(menuData.stock_count); // snake_case → camelCase로 처리
     } catch (error) {
       console.error(error);
       alert("메뉴 정보를 불러오는 중 오류가 발생했습니다.");
@@ -54,20 +54,14 @@ export default function EditMenu({ params }: Props) {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/admin/menus/${menuId}`, {
+      const res = await apiFetch(`/admin/menus/${menuId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(updatedMenu),
+        headers: { "Content-Type": "application/json" },
       });
 
-      if (!res.ok) throw new Error("메뉴 수정 실패");
-
-      // 수정된 메뉴 응답 받기
-      const updated = await res.json();
       alert(
-        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${updated.name}\n- 설명: ${updated.description}\n- 가격: ${updated.price}원\n- 재고: ${updated.stock_count}개`
+        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${res.data.name}\n- 설명: ${res.data.description}\n- 가격: ${res.data.price}원\n- 재고: ${res.data.stock_count}개`
       );
 
       router.push("/admin/menus"); // 수정 후 목록으로 이동
