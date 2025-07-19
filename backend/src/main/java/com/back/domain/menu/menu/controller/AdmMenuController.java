@@ -27,8 +27,8 @@ public class AdmMenuController {
     @PostMapping("/addmenu")
     @Transactional
     @Operation(summary = "메뉴 등록")
-    public ResponseEntity<RsData<Menu>> addMenu(@RequestBody Menu menu) {
-        Menu savedMenu = menuRepository.save(menu);
+    public ResponseEntity<RsData<Menu>> addMenu(@Valid @RequestBody MenuDto menuDto) {
+        Menu savedMenu = menuService.addMenu(menuDto);
         return ResponseEntity.ok(RsData.success("메뉴 등록 성공", savedMenu));
     }
     @PutMapping("/menus/{menuId}")
