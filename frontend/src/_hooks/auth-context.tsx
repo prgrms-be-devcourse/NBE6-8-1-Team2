@@ -1,12 +1,12 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { removeToken, getToken } from "@/lib/authService";
+import { apiFetch } from "@/lib/apiFetch";
 
 type AuthContextType = {
   isLoggedIn: boolean;
-  login: () => void;   // 전역 상태 true
-  logout: () => void;  // 전역 상태 false + 토큰 제거
+  login: () => void;
+  logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -14,17 +14,26 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // 초기 mount 시 localStorage token 검사
+  // 초기 mount 시 서버로 로그인 상태 확인
   useEffect(() => {
-    const token = getToken();
-    setIsLoggedIn(!!token);
+    (async () => {
+      try {
+        await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
+        setIsLoggedIn(true);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    })();
   }, []);
 
   const login = () => setIsLoggedIn(true);
 
-  const logout = () => {
-    removeToken();
-    setIsLoggedIn(false);
+  const logout = async () => {
+    try {
+      await apiFetch("/logout", { method: "POST" });
+      setIsLoggedIn(false);
+    } catch (err: any) {
+    }
   };
 
   return (

@@ -3,7 +3,7 @@ export async function apiFetch<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-  const url = path; // 기본 경로 유지
+  const url = path;
 
   const res = await fetch(`${baseUrl}${url}`, {
     ...options,
@@ -11,8 +11,13 @@ export async function apiFetch<T>(
       "Content-Type": "application/json",
       ...(options.headers || {}),
     },
-    credentials: "include", // 쿠키 인증
+    credentials: "include",
   });
+
+  // 상태코드가 204(No Content)면 json 파싱하지 말고 바로 반환
+  if (res.status === 204) {
+    return {} as T;
+  }
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
