@@ -5,15 +5,19 @@ import com.back.global.jpa.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class Menu extends BaseEntity {
     private String name;
     private String description;
     private int price;
     private int stock_count;
+    private String imageUrl;      // 이미지 URL
+    private String imageName;     // 원본 파일명
     private String category;
 
     public Menu(String name, String description, int price, int stock_count, String category) {

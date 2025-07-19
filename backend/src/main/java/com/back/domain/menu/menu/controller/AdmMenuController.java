@@ -3,16 +3,18 @@ package com.back.domain.menu.menu.controller;
 import com.back.domain.menu.menu.dto.MenuDto;
 import com.back.domain.menu.menu.dto.MenuResponseDto;
 import com.back.domain.menu.menu.entity.Menu;
-import com.back.domain.menu.menu.repository.MenuRepository;
 import com.back.domain.menu.menu.service.MenuService;
+import com.back.global.file.FileStorageService;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,21 +23,36 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "AdminMenuAPI", description = "관리자가 사용하는 메뉴 CRUD API")
 public class AdmMenuController {
-    private final MenuRepository menuRepository;
     private final MenuService menuService;
+    private final FileStorageService fileStorageService;
 
-    @PostMapping("/addmenu")
+    @PostMapping(value = "/addmenu", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     @Operation(summary = "메뉴 등록")
-    public ResponseEntity<RsData<Menu>> addMenu(@Valid @RequestBody MenuDto menuDto) {
-        Menu savedMenu = menuService.addMenu(menuDto);
+    public ResponseEntity<RsData<Menu>> addMenu(
+            @RequestPart("menu") @Valid MenuDto menuDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
+        Menu savedMenu = menuService.addMenuWithImage(menuDto,imageFile);
         return ResponseEntity.ok(RsData.success("메뉴 등록 성공", savedMenu));
     }
-    @PutMapping("/menus/{menuId}")
+
+    @PutMapping(value = "/menus/{menuId}", consumes = {
+            MediaType.MULTIPART_FORM_DATA_VALUE,
+            MediaType.APPLICATION_JSON_VALUE
+    })
     @Transactional
     @Operation(summary = "메뉴 수정")
-    public ResponseEntity<RsData<Menu>> updateMenu(@PathVariable Integer menuId, @RequestBody @Valid MenuDto menuDto) {
-        Menu updatedMenu = menuService.updateMenu(menuId, menuDto);
+    public ResponseEntity<RsData<Menu>> updateMenu(
+            @PathVariable Integer menuId,
+            @RequestPart(value = "menu", required = false) @Valid MenuDto menuDto,
+            @RequestBody(required = false) @Valid MenuDto menuDtoJson,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
+        // JSON 요청인지 Multipart 요청인지 구분
+        MenuDto actualMenuDto = menuDto != null ? menuDto : menuDtoJson;
+
+        Menu updatedMenu = menuService.updateMenuWithImage(menuId, actualMenuDto, imageFile);
         return ResponseEntity.ok(RsData.success("메뉴 수정 성공", updatedMenu));
     }
     @DeleteMapping("/menus/{menuId}")
