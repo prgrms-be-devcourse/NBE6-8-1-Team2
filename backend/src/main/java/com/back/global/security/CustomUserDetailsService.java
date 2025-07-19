@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +25,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         Member member = memberService.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
 
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
+        List<GrantedAuthority> authorities =
+                List.of(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
 
-        return new SecurityUser(
-                member.getEmail(),
-                member.getNickname(),
-                member.getAddress(),
-                member.getPassword(),
-                authorities
-        );
+        return new SecurityUser(member, authorities);
     }
 }

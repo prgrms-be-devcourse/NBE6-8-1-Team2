@@ -53,7 +53,7 @@ public class OrderService {
         }
 
         order.setTotalPrice(totalPrice);
-        orderRepository.save(order);    // order저장
+        orderRepository.save(order);    // order 저장
 
         List<OrderMenuResponseDto> responseMenus = order.getOrderItems().stream()
                 .map(om -> new OrderMenuResponseDto(

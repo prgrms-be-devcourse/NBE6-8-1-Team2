@@ -25,10 +25,13 @@ public class Member extends BaseEntity{
     private Role role = Role.USER;
 
     // 관리자 생성 임시 메서드입니다.(추후 삭제 예정)
-    public Member(String email, String password, Role role) {
+    public Member(String email, String password, String nickname, String address, Role role) {
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
+        this.address = address;
         this.role = role;
+        this.apiKey = UUID.randomUUID().toString();
     }
 
     public Member(String email, String password, String nickname, String address) {
