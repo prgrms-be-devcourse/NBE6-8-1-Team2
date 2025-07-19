@@ -34,6 +34,8 @@ export default function Menus() {
         description: menu.description,
         price: menu.price,
         stockCount: menu.stock_count, // snake_case → camelCase
+        imageUrl: menu.imageUrl,
+        imageName: menu.imageName,
       }));
 
       setMenus(formattedMenus);
@@ -139,6 +141,7 @@ export default function Menus() {
           <thead className="bg-black text-white font-bold tracking-wide uppercase h-12 border-b border-gray-300 rounded">
             <tr>
               <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">이미지</th>
               <th className="px-4 py-2 text-left">이름</th>
               <th className="px-4 py-2 text-left">설명</th>
               <th className="px-4 py-2 text-left">가격</th>
@@ -150,6 +153,25 @@ export default function Menus() {
             {menus.map((menu) => (
               <tr key={menu.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3 text-left font-medium">{menu.id}</td>
+                <td className="px-4 py-3 text-left">
+                  {menu.imageUrl ? (
+                    <img 
+                      src={menu.imageUrl} 
+                      alt={menu.imageName || menu.name}
+                      className="w-12 h-12 object-cover rounded"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <span 
+                    className="text-gray-400 text-sm" 
+                    style={{display: menu.imageUrl ? 'none' : 'block'}}
+                  >
+                    이미지 없음
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-left">{menu.name}</td>
                 <td className="px-4 py-3 text-left">{menu.description}</td>
                 <td className="px-4 py-3 text-right">
