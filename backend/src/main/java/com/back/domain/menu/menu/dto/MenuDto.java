@@ -13,6 +13,6 @@ public record MenuDto(
         String imageName
 ) {
     public Menu toEntity() {
-        return new Menu(name, description, price, stock_count, category);
+        return new Menu(name, description, price, stock_count, category, imageUrl, imageName);
     }
 }
