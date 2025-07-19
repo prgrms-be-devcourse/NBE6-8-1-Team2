@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/apiFetch"; // apiFetch 임포트
+import { toast } from "react-toastify"; // toastify 임포트
 
 type Props = {
   params: { id: string };
@@ -32,7 +33,7 @@ export default function EditMenu({ params }: Props) {
       setStockCount(menuData.stock_count); // snake_case → camelCase로 처리
     } catch (error) {
       console.error(error);
-      alert("메뉴 정보를 불러오는 중 오류가 발생했습니다.");
+      toast.error("메뉴 정보를 불러오는 중 오류가 발생했습니다."); // toastify로 오류 알림
     } finally {
       setLoading(false);
     }
@@ -60,14 +61,11 @@ export default function EditMenu({ params }: Props) {
         headers: { "Content-Type": "application/json" },
       });
 
-      alert(
-        `메뉴가 수정되었습니다!\n\n 수정 결과:\n- 이름: ${res.data.name}\n- 설명: ${res.data.description}\n- 가격: ${res.data.price}원\n- 재고: ${res.data.stock_count}개`
-      );
-
+      toast.success(`메뉴가 수정되었습니다!\n- 이름: ${res.data.name}\n- 가격: ${res.data.price}원`); // 수정 성공 알림
       router.push("/admin/menus"); // 수정 후 목록으로 이동
     } catch (error) {
       console.error(error);
-      alert("메뉴를 수정하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 수정하는 중 오류가 발생했습니다."); // 수정 실패 알림
     }
   };
 
@@ -83,7 +81,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">메뉴 이름</label>
             <input
               type="text"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="메뉴 이름을 입력하세요"
@@ -93,7 +91,7 @@ export default function EditMenu({ params }: Props) {
           <div>
             <label className="block text-lg font-semibold">설명</label>
             <textarea
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="메뉴 설명을 입력하세요"
@@ -104,7 +102,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">가격</label>
             <input
               type="number"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={price}
               onChange={(e) => setPrice(Number(e.target.value))}
               placeholder="가격을 입력하세요"
@@ -115,7 +113,7 @@ export default function EditMenu({ params }: Props) {
             <label className="block text-lg font-semibold">재고</label>
             <input
               type="number"
-              className="w-full border p-2"
+              className="w-full border p-2 rounded"
               value={stockCount}
               onChange={(e) => setStockCount(Number(e.target.value))}
               placeholder="재고 수량을 입력하세요"
@@ -128,7 +126,7 @@ export default function EditMenu({ params }: Props) {
             <button
               type="button"
               onClick={() => router.push("/admin/menus")}
-              className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
+              className="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded"
             >
               취소
             </button>
@@ -136,7 +134,7 @@ export default function EditMenu({ params }: Props) {
             {/* 수정 버튼 */}
             <button
               type="submit"
-              className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
+              className="px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
             >
               수정하기
             </button>
