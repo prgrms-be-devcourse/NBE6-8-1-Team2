@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
-import { User } from "@/types/auth";
 
 type User = {
   email: string;
@@ -34,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData);
         setIsLoggedIn(true);
       } catch {
-        setUser(null);
         setIsLoggedIn(false);
       } finally {
         setIsLoading(false); 
