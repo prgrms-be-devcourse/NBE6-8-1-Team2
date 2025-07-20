@@ -18,32 +18,36 @@ export function useSignup() {
   const [isLoading, setIsLoading] = useState(false);
 
   const signup = async (form: SignupForm): Promise<boolean> => {
-    setIsLoading(true); // 로딩 시작
-
+    setIsLoading(true);
+  
     const validationError = validateSignupForm(form);
     if (validationError) {
       toast.error(validationError);
       setIsLoading(false);
       return false;
     }
-
+  
     try {
-      await apiFetch("/signup", {
+      const res = await apiFetch<{
+        resultCode: string;
+        msg: string;
+        data: any;
+      }>("/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(form),
       });
-
-      toast.success("회원가입이 완료되었습니다.");
+  
+      toast.success(res.msg);
       return true;
     } catch (err: any) {
       const msg = err.message || "회원가입에 실패했습니다.";
       toast.error(msg);
       return false;
     } finally {
-      setIsLoading(false); // 로딩 끝
+      setIsLoading(false);
     }
   };
 
