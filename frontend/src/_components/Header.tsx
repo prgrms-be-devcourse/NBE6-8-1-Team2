@@ -8,7 +8,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
 
   // 회원가입, 로그인 페이지에서는 헤더 숨김
   if (pathname === "/login" || pathname === "/signup") return null;
@@ -23,7 +23,8 @@ export default function Header() {
       <h1 className="text-3xl font-title font-bold">Grids & Circles</h1>
 
       <nav className="flex items-center gap-6 text-base">
-        {isLoggedIn && (
+        {/* 관리자 아닌 경우에만 표시 */}
+        {isLoggedIn && user?.role !== "ADMIN" && (
           <>
             <Link href="/order" className="hover:underline">
               주문하기
