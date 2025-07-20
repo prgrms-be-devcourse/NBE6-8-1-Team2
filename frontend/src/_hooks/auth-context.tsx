@@ -2,9 +2,13 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import { User } from "@/types/auth";
 
 type AuthContextType = {
   isLoggedIn: boolean;
+  isLoading: boolean;
+  user: User | null;
+  isAdmin: boolean;
   login: () => void;
   logout: () => void;
 };
@@ -13,15 +17,20 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 초기 mount 시 서버로 로그인 상태 확인
   useEffect(() => {
     (async () => {
       try {
-        await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
+        const userData = await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
+        setUser(userData);
         setIsLoggedIn(true);
       } catch {
+        setUser(null);
         setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
       }
     })();
   }, []);
@@ -31,13 +40,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await apiFetch("/logout", { method: "POST" });
+      setUser(null);
       setIsLoggedIn(false);
     } catch (err: any) {
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isLoading, user, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
