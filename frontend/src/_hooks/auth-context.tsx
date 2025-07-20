@@ -3,8 +3,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
 
+type User = {
+  email: string;
+  nickname: string;
+  address: string;
+  role: "ADMIN" | "USER";
+};
+
 type AuthContextType = {
   isLoggedIn: boolean;
+  user: User | null;
   isLoading: boolean;
   login: () => void;
   logout: () => void;
@@ -14,34 +22,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 mount 시 서버로 로그인 상태 확인
+  // 초기 mount 시 로그인 상태 및 사용자 정보 확인
   useEffect(() => {
     (async () => {
       try {
-        await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
+        const userData = await apiFetch<User>("/auth/me");
+        setUser(userData);
         setIsLoggedIn(true);
       } catch {
+        setUser(null);
         setIsLoggedIn(false);
       } finally {
-        setIsLoading(false);
+        setIsLoading(false); 
       }
     })();
   }, []);
 
-  const login = () => setIsLoggedIn(true);
+  const login = () => {
+    setIsLoggedIn(true);
+    setIsLoading(true);
+    apiFetch<User>("/auth/me")
+      .then(setUser)
+      .catch(() => {
+        setIsLoggedIn(false);
+        setUser(null);
+      })
+      .finally(() => setIsLoading(false)); 
+  };
 
   const logout = async () => {
     try {
       await apiFetch("/logout", { method: "POST" });
-      setIsLoggedIn(false);
-    } catch (err: any) {
-    }
+    } catch {}
+    setIsLoggedIn(false);
+    setUser(null);
+    setIsLoading(false); 
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -20,10 +20,10 @@ export async function apiFetch<T>(
     });
 
     if (reissueRes.ok) {
-      // ✅ 쿠키 반영까지 아주 잠깐 delay → 브라우저에 반영될 시간 확보
+      // 쿠키 반영까지 아주 잠깐 delay → 브라우저에 반영될 시간 확보
       await new Promise((r) => setTimeout(r, 100)); // 100ms 딜레이
 
-      // ✅ 원래 요청 재시도
+      // 원래 요청 재시도
       res = await fetch(`${baseUrl}${url}`, {
         ...options,
         headers: {

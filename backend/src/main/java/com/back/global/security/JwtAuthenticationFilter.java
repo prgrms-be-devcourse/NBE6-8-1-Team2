@@ -50,12 +50,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰이 유효한 경우 → 인증 처리
             Map<String, Object> payload = jwt.payload(secret, token);
             String email = (String) payload.get("email");
+            String role = (String) payload.get("role");
 
             Member member = memberRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
 
             List<SimpleGrantedAuthority> authorities =
-                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
 
             SecurityUser securityUser = new SecurityUser(member, authorities);
 
