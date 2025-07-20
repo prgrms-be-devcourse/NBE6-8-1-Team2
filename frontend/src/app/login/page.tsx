@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLogin } from "@/_hooks/useLogin";
 import { LoginForm } from "@/types";
 import { InputField } from "@/_components/ui/InputField";
-import { ErrorMessage } from "@/_components/ui/ErrorMessage";
 
 export default function LoginPage() {
-  const { login, isLoading, errorMessage } = useLogin();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "/order";
+  const { login, isLoading } = useLogin();
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,7 +18,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(form);
+    login(form, from);
   };
 
   return (
@@ -49,8 +51,6 @@ export default function LoginPage() {
           >
             {isLoading ? "로그인 중..." : "로그인"}
           </button>
-
-          <ErrorMessage message={errorMessage} />
         </form>
       </div>
     </div>

@@ -1,11 +1,15 @@
 package com.back.global.globalExceptionHandler;
 
 import com.back.global.exception.ServiceException;
+import com.back.global.exception.StockShortageException;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @ControllerAdvice
 @Hidden // Swagger에서 이 클래스 숨김 처리(로직은 정상 작동)
@@ -36,6 +40,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .badRequest()
                 .body(RsData.fail(errorMessage));
+    }
+
+    // 재고 부족 StockShortageException 처리
+    @ExceptionHandler(StockShortageException.class)
+    public ResponseEntity<RsData<List<Map<String, Object>>>> handleStockShortage(StockShortageException e) {
+        return ResponseEntity
+                .badRequest()
+                .body(RsData.fail(e.getMsg(), e.getShortages()));
     }
 
     // 기타 모든 예외 처리
