@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/apiFetch";
 
 type AuthContextType = {
   isLoggedIn: boolean;
+  isLoading: boolean;
   login: () => void;
   logout: () => void;
 };
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 초기 mount 시 서버로 로그인 상태 확인
   useEffect(() => {
@@ -22,6 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsLoggedIn(true);
       } catch {
         setIsLoggedIn(false);
+      } finally {
+        setIsLoading(false);
       }
     })();
   }, []);
@@ -37,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
