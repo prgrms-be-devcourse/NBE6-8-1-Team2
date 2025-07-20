@@ -2,13 +2,10 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
-import { User } from "@/types/auth";
 
 type AuthContextType = {
   isLoggedIn: boolean;
   isLoading: boolean;
-  user: User | null;
-  isAdmin: boolean;
   login: () => void;
   logout: () => void;
 };
@@ -23,11 +20,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const userData = await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
-        setUser(userData);
+        await apiFetch("/auth/me"); // 로그인된 유저 정보 확인
         setIsLoggedIn(true);
       } catch {
-        setUser(null);
         setIsLoggedIn(false);
       } finally {
         setIsLoading(false);
@@ -40,14 +35,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await apiFetch("/logout", { method: "POST" });
-      setUser(null);
       setIsLoggedIn(false);
     } catch (err: any) {
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, isLoading, user, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
