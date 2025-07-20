@@ -5,7 +5,7 @@ spring:
   application:
     name: back
   profiles:
-    active: test
+    active: dev
   servlet:
     multipart:
       max-file-size: 5MB
