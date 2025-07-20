@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/apiFetch"; // apiFetch 임포트
+import { apiFetch, API_BASE_URL } from "@/lib/apiFetch";
 import { toast } from "react-toastify"; // toastify 임포트
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default function EditMenu({ params }: Props) {
-  const menuId = params.id;
+  const { id } = use(params);
+  const menuId = Number(id);
   const router = useRouter();
 
   // 기존 메뉴 정보를 상태로 관리
@@ -20,24 +21,33 @@ export default function EditMenu({ params }: Props) {
   const [stockCount, setStockCount] = useState<number>(0);
   const [imageUrl, setImageUrl] = useState("");
   const [imageName, setImageName] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // 파일 선택 핸들러
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setImageName(file.name);
+    }
+  };
 
   // 메뉴 상세 조회 → 기존 데이터 불러오기
   const fetchMenu = async () => {
     try {
       const res = await apiFetch(`/admin/menus/${menuId}`);
-      // 응답에서 data 필드를 통해 메뉴 정보 가져오기
-      const menuData = res.data;
+      const menuData = res.data || res;
 
       setName(menuData.name || "");
       setDescription(menuData.description || "");
       setPrice(menuData.price || 0);
-      setStockCount(menuData.stock_count || 0); // snake_case → camelCase로 처리
+      setStockCount(menuData.stock_count || 0);
       setImageUrl(menuData.imageUrl || "");
       setImageName(menuData.imageName || "");
     } catch (error) {
       console.error(error);
-      toast.error("메뉴 정보를 불러오는 중 오류가 발생했습니다."); // toastify로 오류 알림
+      toast.error("메뉴 정보를 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -51,29 +61,52 @@ export default function EditMenu({ params }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const updatedMenu = {
-      name,
-      description,
-      price,
-      stock_count: stockCount,
-      imageUrl,
-      imageName,
-    };
-
     try {
-      const res = await apiFetch(`/admin/menus/${menuId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedMenu),
-      });
+      const menuData = {
+        name,
+        description,
+        price,
+        stock_count: stockCount,
+        imageUrl: imageUrl,  // 기존 이미지 URL 포함
+        imageName: imageName, // 기존 이미지 이름 포함
+      };
 
-      toast.success(`메뉴가 수정되었습니다!\n- 이름: ${res.data.name}\n- 가격: ${res.data.price}원`); // 수정 성공 알림
-      router.push("/admin/menus"); // 수정 후 목록으로 이동
+      let response;
+      
+      if (selectedFile) {
+        // 새 이미지가 선택된 경우: FormData 사용 (이미지 변경)
+        const formData = new FormData();
+        formData.append("menu", new Blob([JSON.stringify(menuData)], {
+          type: "application/json"
+        }));
+        formData.append("image", selectedFile);
+        
+        response = await apiFetch(`/admin/menus/${menuId}`, {
+          method: "PUT",
+          body: formData,
+        });
+        
+        toast.info("메뉴 정보와 이미지가 함께 수정됩니다.");
+      } else {
+        // 새 이미지가 선택되지 않은 경우: JSON 사용 (정보만 수정, 이미지 유지)
+        response = await apiFetch(`/admin/menus/${menuId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(menuData),
+        });
+      }
+
+      if (response.resultCode === "200-OK") {
+        toast.success(response.msg || "메뉴가 수정되었습니다.");
+        router.push("/admin/menus");
+      } else {
+        toast.error(response.msg || "메뉴 수정에 실패했습니다.");
+      }
     } catch (error) {
       console.error(error);
-      toast.error("메뉴를 수정하는 중 오류가 발생했습니다."); // 수정 실패 알림
+      toast.error("메뉴를 수정하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -128,26 +161,39 @@ export default function EditMenu({ params }: Props) {
             />
           </div>
 
-          <div>
-            <label className="block text-lg font-semibold">이미지 URL</label>
-            <input
-              type="text"
-              className="w-full border p-2 rounded"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="/images/latte.jpg"
-            />
-          </div>
+          {/* 기존 이미지 미리보기 */}
+          {imageUrl && (
+            <div>
+              <label className="block text-lg font-semibold mb-2">현재 이미지</label>
+              <img 
+                src={`${API_BASE_URL}${imageUrl}`} 
+                alt={imageName || name}
+                className="w-32 h-32 object-cover rounded border"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
 
           <div>
-            <label className="block text-lg font-semibold">이미지 이름</label>
+            <label className="block text-lg font-semibold">
+              상품 이미지 변경
+              <span className="text-sm font-normal text-gray-500 ml-2">
+                (선택하지 않으면 기존 이미지 유지)
+              </span>
+            </label>
             <input
-              type="text"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
               className="w-full border p-2 rounded"
-              value={imageName}
-              onChange={(e) => setImageName(e.target.value)}
-              placeholder="latte.jpg"
             />
+            {selectedFile && (
+              <p className="text-sm text-gray-600 mt-1">
+                새로운 이미지로 변경됩니다: {selectedFile.name}
+              </p>
+            )}
           </div>
 
           {/* 버튼 그룹: 오른쪽 정렬 */}
