@@ -17,6 +17,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ko } from "date-fns/locale";
 import { format } from "date-fns";
+import { parseISO } from "date-fns/parseISO";
 
 const koLocale = ko as any;
 
@@ -92,13 +93,19 @@ export default function SalesChart() {
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis
+            dataKey="date"
+            tickFormatter={(dateStr: string) => format(parseISO(dateStr), "MM/dd")}
+          />
           <YAxis
             width={80}
             tickFormatter={(v: number) => `₩${v.toLocaleString()}`}
           />
           <Tooltip
-            formatter={(value: number) => `₩${value.toLocaleString()}`}
+            labelFormatter={(label: string) =>
+              `날짜: ${format(parseISO(label), "yyyy-MM-dd")}`
+            }
+            formatter={(value: number) => [`₩${value.toLocaleString()}`, "일일 매출"]}
           />
           <Line
             type="monotone"
@@ -126,6 +133,11 @@ export default function SalesChart() {
             ))}
         </LineChart>
       </ResponsiveContainer>
+
+      {/* 집계 기준 문구 */}
+      <p className="text-xs text-gray-500 text-right mt-2">
+        * 오전 2시 ~ 오후 2시 기준 일일 매출 집계
+      </p>
     </div>
   );
 }
