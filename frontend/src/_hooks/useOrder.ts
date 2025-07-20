@@ -1,11 +1,17 @@
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/apiFetch";
-import { CartItem, OrderItem } from "@/types"; 
+import { useState } from "react";
 import { toast } from "react-toastify";
+import { CartItem, OrderItem } from "@/types";
+import { apiFetch } from "@/lib/apiFetch";
+import { useCart } from "@/_contexts/CartContext";
+
+interface ApiError extends Error {
+  data?: any;
+}
 
 export function useOrder() {
   const router = useRouter();
+  const { clearCart } = useCart(); 
   const [state, setState] = useState<UseApiState>({
     isLoading: false,
     errorMessage: "",
@@ -13,7 +19,7 @@ export function useOrder() {
 
   const order = async (cart: CartItem[]) => {
     if (cart.length === 0) {
-      setState({ ...state, errorMessage: "*장바구니가 비어 있습니다."});
+      setState({ ...state, errorMessage: "*장바구니가 비어 있습니다." });
       return;
     }
 
@@ -29,13 +35,33 @@ export function useOrder() {
     try {
       await apiFetch("/orders", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ orderItems: items }),
       });
 
       toast.success("주문이 완료되었습니다.");
+      clearCart(); // 장바구니 비우기 
       router.push("/mypage");
-    } catch (err: any) {
-      toast.error(err.message || "주문 중 오류가 발생했습니다.");
+    } catch (err: unknown) {
+      const error = err as ApiError;
+    
+      if (error?.data && Array.isArray(error.data)) {
+        const shortages = error.data;
+    
+        toast.error("재고가 부족한 메뉴가 있습니다.");
+    
+        const messageList = shortages
+          .map((item: any) => `${item.name} : ${item.remaining}개 남음`)
+          .join("/ ");
+    
+          toast.error(messageList);
+      } else {
+        toast.error(error.message || "주문 중 오류가 발생했습니다.");
+      }    
+    } finally {
+      setState((prev) => ({ ...prev, isLoading: false }));
     }
   };
 

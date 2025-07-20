@@ -30,6 +30,9 @@ export function useSignup() {
     try {
       await apiFetch("/signup", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       });
 

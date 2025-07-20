@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Menu } from "@/types";  // 공용 타입 사용
 import { apiFetch } from "@/lib/apiFetch";
+import { toast } from "react-toastify";  // toastify 임포트
 
 export default function Menus() {
   const router = useRouter();
@@ -19,6 +20,8 @@ export default function Menus() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
+  const [imageUrl, setImageUrl] = useState("");     // ✅ 추가
+  const [imageName, setImageName] = useState("");   // ✅ 추가
 
   const fetchMenus = async () => {
     try {
@@ -31,12 +34,14 @@ export default function Menus() {
         description: menu.description,
         price: menu.price,
         stockCount: menu.stock_count, // snake_case → camelCase
+        imageUrl: menu.imageUrl,
+        imageName: menu.imageName,
       }));
 
       setMenus(formattedMenus);
     } catch (error) {
       console.error("메뉴 목록 불러오기 실패", error);
-      alert("메뉴 데이터를 불러오는 데 실패했습니다.");
+      toast.error("메뉴 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
     } finally {
       setLoading(false);
     }
@@ -55,23 +60,42 @@ export default function Menus() {
     e.preventDefault();
 
     try {
+      const formData = new FormData();
+      
+      const menuData = {
+        name,
+        description,
+        price,
+        stock_count: stockCount,
+        imageUrl,
+        imageName,
+      };
+      
+      // menu part를 JSON blob으로 추가
+      formData.append("menu", new Blob([JSON.stringify(menuData)], {
+        type: "application/json"
+      }));
+
       await apiFetch("/admin/addmenu", {
         method: "POST",
-        body: JSON.stringify({
-          name,
-          description,
-          price,
-          stock_count: stockCount, // stockCount → stock_count로 수정
-        }),
-        headers: { "Content-Type": "application/json" },
+        body: formData,
       });
 
-      alert("메뉴가 등록되었습니다.");
+      toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
+      
+      // 폼 데이터 초기화
+      setName("");
+      setDescription("");
+      setPrice(0);
+      setStockCount(0);
+      setImageUrl("");
+      setImageName("");
+      
       closeModal(); // 모달 닫기
       fetchMenus(); // 등록 후 목록 새로고침
     } catch (error) {
       console.error("메뉴 등록 실패", error);
-      alert("메뉴를 등록하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 등록하는 중 오류가 발생했습니다.");  // 실패 메시지
     }
   };
 
@@ -90,12 +114,11 @@ export default function Menus() {
         method: "DELETE",
       });
 
-      // 응답에서 `msg`를 사용하여 알림 표시
-      alert(result.message || "메뉴가 삭제되었습니다.");
+      toast.success(result.message || "메뉴가 삭제되었습니다.");  // 성공 메시지
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
       console.error("메뉴 삭제 실패", error);
-      alert("메뉴를 삭제하는 중 오류가 발생했습니다.");
+      toast.error("메뉴를 삭제하는 중 오류가 발생했습니다.");  // 실패 메시지
     }
   };
 
@@ -108,16 +131,17 @@ export default function Menus() {
       {/* 메뉴 등록 버튼 → 모달 열기 */}
       <button
         onClick={openModal}
-        className="mb-4 px-4 py-2 bg-black text-white hover:bg-neutral-800"
+        className="mb-4 px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
       >
         메뉴 등록
       </button>
 
-      <div className="overflow-x-auto border border-gray-300">
-        <table className="w-full table-auto text-sm text-left text-black bg-white">
-          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12 border-b border-gray-300">
+      <div className="overflow-x-auto border border-gray-300 rounded">
+        <table className="w-full table-auto text-sm text-left text-black bg-white rounded">
+          <thead className="bg-black text-white font-bold tracking-wide uppercase h-12 border-b border-gray-300 rounded">
             <tr>
               <th className="px-4 py-2 text-left">ID</th>
+              <th className="px-4 py-2 text-left">이미지</th>
               <th className="px-4 py-2 text-left">이름</th>
               <th className="px-4 py-2 text-left">설명</th>
               <th className="px-4 py-2 text-left">가격</th>
@@ -129,6 +153,25 @@ export default function Menus() {
             {menus.map((menu) => (
               <tr key={menu.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-4 py-3 text-left font-medium">{menu.id}</td>
+                <td className="px-4 py-3 text-left">
+                  {menu.imageUrl ? (
+                    <img 
+                      src={menu.imageUrl} 
+                      alt={menu.imageName || menu.name}
+                      className="w-12 h-12 object-cover rounded"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling.style.display = 'block';
+                      }}
+                    />
+                  ) : null}
+                  <span 
+                    className="text-gray-400 text-sm" 
+                    style={{display: menu.imageUrl ? 'none' : 'block'}}
+                  >
+                    이미지 없음
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-left">{menu.name}</td>
                 <td className="px-4 py-3 text-left">{menu.description}</td>
                 <td className="px-4 py-3 text-right">
@@ -138,7 +181,7 @@ export default function Menus() {
                 <td className="px-4 py-3 text-left space-x-2">
                   {/* 수정 버튼 */}
                   <button
-                    className="px-2 py-1 bg-black text-white hover:bg-neutral-800"
+                    className="px-2 py-1 bg-black text-white hover:bg-neutral-800 rounded"
                     onClick={() => handleEditMenu(menu.id)}
                   >
                     수정
@@ -146,7 +189,7 @@ export default function Menus() {
                   {/* 삭제 버튼 */}
                   <button
                     onClick={() => handleDeleteMenu(menu.id)}
-                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400"
+                    className="px-2 py-1 bg-gray-300 hover:bg-gray-400 rounded"
                   >
                     삭제
                   </button>
@@ -160,7 +203,7 @@ export default function Menus() {
       {/* 메뉴 등록 모달 */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 max-w-md w-full">
+          <div className="bg-white p-6 max-w-md w-full rounded">
             <h2 className="text-xl font-bold mb-4">메뉴 등록</h2>
 
             <form onSubmit={handleCreateMenu} className="space-y-4">
@@ -168,7 +211,7 @@ export default function Menus() {
                 <label className="block font-semibold">메뉴 이름</label>
                 <input
                   type="text"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="메뉴 이름을 입력하세요"
@@ -178,7 +221,7 @@ export default function Menus() {
               <div>
                 <label className="block font-semibold">설명</label>
                 <textarea
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="메뉴 설명을 입력하세요"
@@ -189,10 +232,9 @@ export default function Menus() {
                 <label className="block font-semibold">가격</label>
                 <input
                   type="number"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
-                  placeholder="가격을 입력하세요"
                 />
               </div>
 
@@ -200,10 +242,31 @@ export default function Menus() {
                 <label className="block font-semibold">재고</label>
                 <input
                   type="number"
-                  className="w-full border p-2"
+                  className="w-full border p-2 rounded"
                   value={stockCount}
                   onChange={(e) => setStockCount(Number(e.target.value))}
-                  placeholder="재고 수량을 입력하세요"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 URL</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="/images/latte.jpg"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold">이미지 이름</label>
+                <input
+                  type="text"
+                  className="w-full border p-2 rounded"
+                  value={imageName}
+                  onChange={(e) => setImageName(e.target.value)}
+                  placeholder="latte.jpg"
                 />
               </div>
 
@@ -211,13 +274,13 @@ export default function Menus() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 bg-gray-300 hover:bg-gray-200"
+                  className="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-black text-white hover:bg-neutral-800"
+                  className="px-4 py-2 bg-black text-white hover:bg-neutral-800 rounded"
                 >
                   등록하기
                 </button>

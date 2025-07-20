@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Order, OrderItem } from "@/types";
 import { apiFetch } from "@/lib/apiFetch";
+import { toast } from "react-toastify";  // toastify 임포트
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -11,11 +12,11 @@ export default function Orders() {
   const fetchOrders = async () => {
     try {
       const response = await apiFetch<any>("/admin/orders");
-      const data: Order[] = response.data || response; // 백엔드 응답 형태에 따라 조정
-      setOrders(data);
+      const data = response.data || response;; // 백엔드 응답 형태에 따라 조정
+      setOrders(data.content);
     } catch (error) {
       console.error("주문 목록 불러오기 실패", error);
-      alert("주문 데이터를 불러오는 데 실패했습니다.");
+      toast.error("주문 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
     } finally {
       setLoading(false);
     }
@@ -35,9 +36,9 @@ export default function Orders() {
       <h1 className="text-2xl font-title font-bold mb-6 text-black">
         전체 주문 목록 조회
       </h1>
-      <div className="overflow-x-auto border border-gray-300">
-        <table className="w-full table-auto text-sm text-left text-black bg-white">
-          <thead className="bg-black text-white text-[13px] font-bold tracking-wide uppercase h-12">
+      <div className="overflow-x-auto border border-gray-300 rounded">
+        <table className="w-full table-auto text-sm text-left text-black bg-white rounded">
+          <thead className="bg-black text-white font-bold tracking-wide uppercase h-12 rounded">
             <tr>
               <th className="px-4 py-2 text-center">주문번호</th>
               <th className="px-4 py-2 text-center">주문일시</th>

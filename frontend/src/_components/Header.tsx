@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/_hooks/auth-context";
 import { useRouter, usePathname } from "next/navigation";
-import { toast } from "react-toastify";
 import Link from "next/link";
 
 export default function Header() {
@@ -15,8 +14,7 @@ export default function Header() {
   if (pathname === "/login" || pathname === "/signup") return null;
 
   const handleLogout = () => {
-    logout(); // 상태 초기화 + 토큰 제거
-    toast.success("로그아웃 되었습니다.");
+    logout(); 
     router.push("/login");
   };
 

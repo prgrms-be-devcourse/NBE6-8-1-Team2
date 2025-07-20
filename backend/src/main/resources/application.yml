@@ -1,8 +1,15 @@
+file:
+  upload-dir: /uploads
+
 spring:
   application:
     name: back
   profiles:
     active: test
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
   h2:
     console:
