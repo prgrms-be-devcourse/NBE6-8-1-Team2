@@ -21,8 +21,10 @@ export async function apiFetch<T>(
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
     const cleanedMsg = error.msg?.split(": ").slice(-1)[0];
-    throw new Error(cleanedMsg || error.message || "API 요청 실패");
+    const err = new Error(cleanedMsg || error.message || "API 요청 실패");
+    (err as any).data = error.data;
+    throw err;
   }
-
+  
   return res.json();
 }

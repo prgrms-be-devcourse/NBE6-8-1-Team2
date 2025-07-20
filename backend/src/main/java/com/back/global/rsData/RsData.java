@@ -28,4 +28,8 @@ public record RsData<T>(
     public static <T> RsData<T> fail(String msg) {
         return new RsData<>("400-FAIL", msg, null);
     }
+
+    public static <T> RsData<T> fail(String msg, T data) {
+        return new RsData<>("400-FAIL", msg, data);
+    }
 }
