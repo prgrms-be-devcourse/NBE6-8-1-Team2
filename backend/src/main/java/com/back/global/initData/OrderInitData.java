@@ -29,7 +29,6 @@ public class OrderInitData {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void init() {
-        // 중복 체크: 이미 admin 계정이 있으면 초기화 하지 않음
         if (memberRepository.findByEmail("admin1@test.com").isPresent()) {
             System.out.println("초기 데이터가 이미 존재합니다. 스킵합니다.");
             return;
