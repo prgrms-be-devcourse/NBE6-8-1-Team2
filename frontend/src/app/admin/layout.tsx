@@ -9,13 +9,18 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
   useEffect(() => {
+    if (isLoading) return;
+    
     if (!isLoggedIn) {
       toast.error("로그인이 필요합니다.");
       router.push(`/login?from=${pathname}`);
     }
   }, [isLoggedIn, router, pathname]);
+      return;
+    }
 
   if (!isLoggedIn) {
     return null;
