@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { apiFetch } from "@/lib/apiFetch";
+import { User } from "@/types/auth";
 
 type User = {
   email: string;
