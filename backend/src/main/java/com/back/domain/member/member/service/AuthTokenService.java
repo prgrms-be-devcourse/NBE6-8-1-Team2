@@ -15,15 +15,32 @@ public class AuthTokenService {
     @Value("${custom.accessToken.expirationSeconds}")
     private int accessTokenExpirationSeconds;
 
+    @Value("${custom.refreshToken.expirationSeconds}")
+    private int refreshTokenExpirationSeconds;
+
     String genAccessToken(Member member) {
         int id = member.getId();
         String email = member.getEmail();
         String nickName = member.getNickname();
+        String role = member.getRole().name(); // 추가
 
         return Ut.jwt.toString(
                 jwtSecretKey,
                 accessTokenExpirationSeconds,
-                Map.of("id", id, "email", email, "nickName", nickName)
+                Map.of(
+                        "id", id,
+                        "email", email,
+                        "nickName", nickName,
+                        "role", role
+                )
+        );
+    }
+
+    public String genRefreshToken(Member member) {
+        return Ut.jwt.toString(
+                jwtSecretKey,
+                refreshTokenExpirationSeconds,
+                Map.of("id", member.getId(), "email", member.getEmail())
         );
     }
 
@@ -36,5 +53,9 @@ public class AuthTokenService {
         String email = (String) parsedPayload.get("email");
 
         return Map.of("id", id, "email", email);
+    }
+
+    public boolean isValid(String token) {
+        return Ut.jwt.isValid(jwtSecretKey, token);
     }
 }

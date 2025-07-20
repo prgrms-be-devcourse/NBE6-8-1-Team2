@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/_hooks/auth-context";
 import { toast } from "react-toastify";
@@ -8,18 +8,28 @@ import { toast } from "react-toastify";
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading, user } = useAuth(); 
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (isLoading) return;
+
+    if (!isLoggedIn || !user) {
       toast.error("로그인이 필요합니다.");
       router.push(`/login?from=${pathname}`);
+      return;
     }
-  }, [isLoggedIn, router, pathname]);
 
-  if (!isLoggedIn) {
-    return null;
-  }
+    if (user.role !== "ADMIN") {
+      toast.error("관리자 권한이 없습니다.");
+      router.push("/");
+      return;
+    }
+
+    setIsChecking(false);
+  }, [isLoggedIn, isLoading, user, pathname, router]);
+
+  if (isLoading || isChecking) return null;
 
   return (
     <div className="flex min-h-screen">

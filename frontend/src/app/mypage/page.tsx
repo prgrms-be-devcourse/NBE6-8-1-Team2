@@ -47,7 +47,7 @@ function getCompactPagination(current: number, total: number): (number | "...")[
 export default function MyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isLoading } = useAuth();
 
   const initialPage = Number(searchParams.get("page")) || 0;
 
@@ -60,7 +60,10 @@ export default function MyPage() {
     router.replace(`/mypage?page=${page}`);
   }, [page, router]);
 
+  // 로그인 여부 확인 및 주문 목록 로드
   useEffect(() => {
+    if (isLoading) return; // 로딩 중이면 아무것도 하지 않음
+
     if (!isLoggedIn) {
       toast.error("로그인이 필요합니다.");
       router.push("/login");
@@ -75,7 +78,10 @@ export default function MyPage() {
       .catch((err) => {
         toast.error("주문 내역 불러오기 실패: " + err.message);
       });
-  }, [isLoggedIn, page, router]);
+  }, [isLoading, isLoggedIn, page, router]);
+
+  // 로딩 중일 때는 아무 것도 렌더링하지 않음
+  if (isLoading) return null;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
