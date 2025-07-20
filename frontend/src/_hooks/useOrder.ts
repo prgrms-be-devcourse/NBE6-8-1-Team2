@@ -42,6 +42,7 @@ export function useOrder() {
       });
 
       toast.success("주문이 완료되었습니다.");
+      await new Promise((res) => setTimeout(res, 700));
       clearCart(); // 장바구니 비우기 
       router.push("/mypage");
     } catch (err: unknown) {

@@ -33,3 +33,5 @@ custom:
     secretKey: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
   accessToken:
     expirationSeconds: 1200
+  refreshToken:
+    expirationSeconds: 604800

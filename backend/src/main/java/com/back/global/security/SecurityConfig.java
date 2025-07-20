@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
                         // 회원가입+로그인+로그아웃 API 인증 상태 확인 허용
-                        .requestMatchers("/signup", "/login", "/auth/me", "/logout").permitAll()
+                        .requestMatchers("/signup", "/login", "/auth/me", "/logout", "/reissue").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
