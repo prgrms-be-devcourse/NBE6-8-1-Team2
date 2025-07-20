@@ -1,6 +1,26 @@
-import { ReactNode } from "react";
+"use client";
+
+import { ReactNode, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/_hooks/auth-context";
+import { toast } from "react-toastify";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { isLoggedIn } = useAuth();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      toast.error("로그인이 필요합니다.");
+      router.push(`/login?from=${pathname}`);
+    }
+  }, [isLoggedIn, router, pathname]);
+
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return (
     <div className="flex min-h-screen">
       {/* 사이드바 */}
