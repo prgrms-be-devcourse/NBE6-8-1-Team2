@@ -49,6 +49,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           >
             메뉴 관리
           </a>
+          <a
+            href="/admin/sales"
+            className="mb-2 px-4 py-2 hover:bg-neutral-800 transition-colors rounded"
+          >
+            매출 통계
+          </a>
         </nav>
       </aside>
 
