@@ -37,7 +37,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = extractAccessTokenFromCookie(request);
 
-        if (token != null && jwt.isValid(secret, token)) {
+        try {
+            // 토큰이 없거나 유효하지 않으면 → 명시적으로 401
+            if (token == null || !jwt.isValid(secret, token)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"msg\": \"유효하지 않거나 누락된 accessToken입니다.\"}");
+                return;
+            }
+
+            // 토큰이 유효한 경우 → 인증 처리
             Map<String, Object> payload = jwt.payload(secret, token);
             String email = (String) payload.get("email");
 
@@ -47,15 +57,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + member.getRole().name()));
 
-            SecurityUser securityUser = new SecurityUser(member, authorities); // 진짜 Member 전달
+            SecurityUser securityUser = new SecurityUser(member, authorities);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(securityUser, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
 
-        filterChain.doFilter(request, response);
+            // 체인 계속
+            filterChain.doFilter(request, response);
+
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write("{\"msg\": \"토큰 인증 과정에서 오류 발생\"}");
+        }
     }
 
     private String extractAccessTokenFromCookie(HttpServletRequest request) {
@@ -68,5 +85,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.equals("/reissue") || path.equals("/signup") || path.equals("/login");
     }
 }

@@ -9,6 +9,7 @@ import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping
@@ -96,7 +98,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    @Transactional(readOnly = true)
+    @Transactional
     @Operation(summary = "로그인")
     public RsData<MemberLoginResBody> login(
             @Valid @RequestBody MemberLoginReqBody reqBody
@@ -110,9 +112,16 @@ public class MemberController {
         );
 
         String accessToken = memberService.genAccessToken(member);
+        String refreshToken = memberService.genRefreshToken(member);
 
+        // refreshToken을 Member에 저장하고 DB 반영
+        member.updateRefreshToken(refreshToken);
+        memberService.save(member); // or memberRepository.save(member);
+
+        // 쿠키 저장
         rq.setCookie("apiKey", member.getApiKey());
         rq.setCookie("accessToken", accessToken);
+        rq.setCookie("refreshToken", refreshToken);
 
         return new RsData<>(
                 "200-1",
@@ -140,16 +149,58 @@ public class MemberController {
     @Operation(summary = "로그아웃")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        // accessToken 쿠키 삭제
-        Cookie cookie = new Cookie("accessToken", "");
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(0); // 즉시 만료
-        cookie.setAttribute("SameSite", "Strict");
+        Member actor = rq.getActor();
 
-        response.addCookie(cookie);
+        if (actor != null) {
+            // 서버에서 refreshToken 삭제
+            memberService.clearRefreshToken(actor);
+        }
+
+        // 쿠키 삭제 = accessToken & refreshToken
+        for (String tokenName : List.of("accessToken", "refreshToken", "apiKey")) {
+            Cookie cookie = new Cookie(tokenName, "");
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
+            cookie.setMaxAge(0); // 즉시 만료
+            cookie.setAttribute("SameSite", "Strict");
+            response.addCookie(cookie);
+        }
 
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Access Token 재발급")
+    @PostMapping("/reissue")
+    public RsData<?> reissue(HttpServletRequest request) {
+        String refreshToken = null;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (refreshToken == null || !memberService.isValidRefreshToken(refreshToken)) {
+            return RsData.fail("유효하지 않은 Refresh Token입니다.");
+        }
+
+        Map<String, Object> payload = memberService.getRefreshTokenPayload(refreshToken);
+        String email = (String) payload.get("email");
+
+        Member member = memberService.findByEmail(email)
+                .orElseThrow(() -> new ServiceException("404-1", "사용자를 찾을 수 없습니다."));
+
+        if (!refreshToken.equals(member.getRefreshToken())) {
+            return RsData.fail("서버에 저장된 토큰과 일치하지 않습니다.");
+        }
+
+        String newAccessToken = memberService.genAccessToken(member);
+        rq.setCookie("accessToken", newAccessToken);
+
+        return RsData.success("Access Token이 재발급되었습니다.");
     }
 }

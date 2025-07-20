@@ -5,7 +5,7 @@ export async function apiFetch<T>(
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
   const url = path;
 
-  const res = await fetch(`${baseUrl}${url}`, {
+  let res = await fetch(`${baseUrl}${url}`, {
     ...options,
     headers: {
       ...(options.headers || {}),
@@ -13,7 +13,29 @@ export async function apiFetch<T>(
     credentials: "include",
   });
 
-  // 상태코드가 204(No Content)면 json 파싱하지 말고 바로 반환
+  if (res.status === 401 && !url.includes("/login") && !url.includes("/signup") && !url.includes("/reissue")) {
+    const reissueRes = await fetch(`${baseUrl}/reissue`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (reissueRes.ok) {
+      // ✅ 쿠키 반영까지 아주 잠깐 delay → 브라우저에 반영될 시간 확보
+      await new Promise((r) => setTimeout(r, 100)); // 100ms 딜레이
+
+      // ✅ 원래 요청 재시도
+      res = await fetch(`${baseUrl}${url}`, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+        },
+        credentials: "include",
+      });
+    } else {
+      throw new Error("세션이 만료되었습니다. 다시 로그인해주세요.");
+    }
+  }
+
   if (res.status === 204) {
     return {} as T;
   }
@@ -25,6 +47,6 @@ export async function apiFetch<T>(
     (err as any).data = error.data;
     throw err;
   }
-  
+
   return res.json();
 }
