@@ -15,9 +15,9 @@ const validateLoginForm = (form: LoginForm): string | null => {
 export function useLogin() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { login: authLogin } = useAuth(); 
+  const { login: authLogin } = useAuth();
 
-  const login = async (form: LoginForm, redirectTo: string = "/order") => {
+  const login = async (form: LoginForm) => {
     setIsLoading(true);
 
     const validationError = validateLoginForm(form);
@@ -28,6 +28,7 @@ export function useLogin() {
     }
 
     try {
+      // 로그인 요청
       await apiFetch("/login", {
         method: "POST",
         headers: {
@@ -36,9 +37,18 @@ export function useLogin() {
         body: JSON.stringify(form),
       });
 
-      authLogin(); // 전역 로그인 상태 true
+      // 로그인 후 사용자 정보 조회
+      const user = await apiFetch<{ role: string }>("/auth/me");
+
+      // 전역 상태 설정 및 분기
+      authLogin();
       toast.success("로그인 성공");
-      router.push(redirectTo);
+
+      if (user.role === "ADMIN") {
+        router.push("/admin/orders");
+      } else {
+        router.push("/order");
+      }
     } catch (err: any) {
       toast.error(err.message || "로그인에 실패했습니다.");
     } finally {
