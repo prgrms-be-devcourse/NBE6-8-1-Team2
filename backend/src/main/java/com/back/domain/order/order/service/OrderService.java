@@ -10,13 +10,16 @@ import com.back.domain.order.order.dto.*;
 import com.back.domain.order.order.entity.Order;
 import com.back.domain.order.order.entity.OrderMenu;
 import com.back.domain.order.order.repository.OrderRepository;
+import com.back.global.exception.StockShortageException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -39,11 +42,38 @@ public class OrderService {
         order.setMember(member);
 
         int totalPrice = 0;
-        for (OrderMenuRequestDto menuDto : requestDto.orderItems()) {
-            final Menu menu = findMenuById(menuDto.menuId());
-            final int quantity = menuDto.quantity();
 
-            menu.decreaseStock(quantity);   // 재고 감소
+        // 재고 부족한 메뉴 리스트 수집
+        List<Map<String, Object>> shortages = new ArrayList<>();
+
+        // 모든 메뉴 먼저 조회 + 재고 체크
+        List<OrderMenuRequestDto> items = requestDto.orderItems();
+        List<Menu> menus = new ArrayList<>();
+
+        for (OrderMenuRequestDto menuDto : items) {
+            Menu menu = findMenuById(menuDto.menuId());
+            menus.add(menu);
+
+            if (menu.getStockCount() < menuDto.quantity()) {
+                shortages.add(Map.of(
+                        "name", menu.getName(),
+                        "remaining", menu.getStockCount()
+                ));
+            }
+        }
+
+        // 부족한 게 있으면 예외 발생
+        if (!shortages.isEmpty()) {
+            throw new StockShortageException(shortages);
+        }
+
+        // 부족한 게 없으면 → 재고 차감 + 주문 메뉴 생성
+        for (int i = 0; i < items.size(); i++) {
+            OrderMenuRequestDto menuDto = items.get(i);
+            Menu menu = menus.get(i);
+            int quantity = menuDto.quantity();
+
+            menu.decreaseStock(quantity); // 재고 차감
             int subtotal = menu.getPrice() * quantity;
             totalPrice += subtotal;
 
@@ -55,9 +85,10 @@ public class OrderService {
         }
 
         order.setTotalPrice(totalPrice);
-        orderRepository.save(order);    // order 저장
+        orderRepository.save(order);
 
         List<OrderMenuResponseDto> responseMenus = toResponseDtos(order.getOrderItems());
+
         return new OrderResponseDto(
                 order.getId(),
                 order.getTotalPrice(),

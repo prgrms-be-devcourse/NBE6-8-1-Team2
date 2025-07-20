@@ -48,4 +48,9 @@ public class Menu extends BaseEntity {
         }
         this.stock_count -= quantity;
     }
+
+    // 수동 getter 추가
+    public int getStockCount() {
+        return this.stock_count;
+    }
 }
