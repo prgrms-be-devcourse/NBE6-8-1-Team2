@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLogin } from "@/_hooks/useLogin";
 import { LoginForm } from "@/types";
 import { InputField } from "@/_components/ui/InputField";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "/order";
   const { login, isLoading } = useLogin();
   const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
 
@@ -15,7 +18,7 @@ export default function LoginPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    login(form);
+    login(form, from);
   };
 
   return (
