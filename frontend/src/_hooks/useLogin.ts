@@ -17,7 +17,7 @@ export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const { login: authLogin } = useAuth(); 
 
-  const login = async (form: LoginForm) => {
+  const login = async (form: LoginForm, redirectTo: string = "/order") => {
     setIsLoading(true);
 
     const validationError = validateLoginForm(form);
@@ -38,7 +38,7 @@ export function useLogin() {
 
       authLogin(); // 전역 로그인 상태 true
       toast.success("로그인 성공");
-      router.push("/order");
+      router.push(redirectTo);
     } catch (err: any) {
       toast.error(err.message || "로그인에 실패했습니다.");
     } finally {
