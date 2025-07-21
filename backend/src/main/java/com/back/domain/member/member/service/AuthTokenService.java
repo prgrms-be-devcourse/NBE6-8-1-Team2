@@ -22,7 +22,7 @@ public class AuthTokenService {
         int id = member.getId();
         String email = member.getEmail();
         String nickName = member.getNickname();
-        String role = member.getRole().name(); // 추가
+        String role = member.getRole().name();
 
         return Ut.jwt.toString(
                 jwtSecretKey,
