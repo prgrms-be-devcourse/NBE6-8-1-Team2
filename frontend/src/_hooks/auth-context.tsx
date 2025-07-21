@@ -33,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(userData);
         setIsLoggedIn(true);
       } catch {
-        setUser(null);
         setIsLoggedIn(false);
       } finally {
         setIsLoading(false); 

@@ -1,15 +1,21 @@
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
 export async function apiFetch<T>(
   path: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  const baseUrl = API_BASE_URL;
   const url = path;
+
+  // FormData인 경우 Content-Type 헤더를 설정하지 않음
+  const headers = { ...(options.headers || {}) };
+  if (options.body instanceof FormData) {
+    delete headers['Content-Type'];
+  }
 
   let res = await fetch(`${baseUrl}${url}`, {
     ...options,
-    headers: {
-      ...(options.headers || {}),
-    },
+    headers,
     credentials: "include",
   });
 
@@ -26,9 +32,7 @@ export async function apiFetch<T>(
       // 원래 요청 재시도
       res = await fetch(`${baseUrl}${url}`, {
         ...options,
-        headers: {
-          ...(options.headers || {}),
-        },
+        headers,
         credentials: "include",
       });
     } else {

@@ -15,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.back.global.exception.ServiceException;
 
 import java.util.List;
 
@@ -37,23 +40,36 @@ public class AdmMenuController {
         return ResponseEntity.ok(RsData.success("메뉴 등록 성공", savedMenu));
     }
 
-    @PutMapping(value = "/menus/{menuId}", consumes = {
-            MediaType.MULTIPART_FORM_DATA_VALUE,
-            MediaType.APPLICATION_JSON_VALUE
-    })
+    @PutMapping(value = "/menus/{menuId}")
     @Transactional
     @Operation(summary = "메뉴 수정")
     public ResponseEntity<RsData<Menu>> updateMenu(
             @PathVariable Integer menuId,
             @RequestPart(value = "menu", required = false) @Valid MenuDto menuDto,
-            @RequestBody(required = false) @Valid MenuDto menuDtoJson,
-            @RequestPart(value = "image", required = false) MultipartFile imageFile
+            @RequestPart(value = "image", required = false) MultipartFile imageFile,
+            HttpServletRequest request
     ) {
-        // JSON 요청인지 Multipart 요청인지 구분
-        MenuDto actualMenuDto = menuDto != null ? menuDto : menuDtoJson;
-
-        Menu updatedMenu = menuService.updateMenuWithImage(menuId, actualMenuDto, imageFile);
-        return ResponseEntity.ok(RsData.success("메뉴 수정 성공", updatedMenu));
+        // Content-Type에 따라 처리 방식 결정
+        String contentType = request.getContentType();
+        
+        if (contentType != null && contentType.contains("application/json")) {
+            // JSON 요청 처리 - RequestBody로 직접 파싱
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                MenuDto jsonMenuDto = objectMapper.readValue(request.getInputStream(), MenuDto.class);
+                Menu updatedMenu = menuService.updateMenuWithImage(menuId, jsonMenuDto, null);
+                return ResponseEntity.ok(RsData.success("메뉴 수정 성공", updatedMenu));
+            } catch (Exception e) {
+                throw new ServiceException("400-1", "잘못된 요청 형식입니다");
+            }
+        } else {
+            // Multipart 요청 처리
+            if (menuDto == null) {
+                throw new ServiceException("400-1", "메뉴 정보가 필요합니다");
+            }
+            Menu updatedMenu = menuService.updateMenuWithImage(menuId, menuDto, imageFile);
+            return ResponseEntity.ok(RsData.success("메뉴 수정 성공", updatedMenu));
+        }
     }
     @DeleteMapping("/menus/{menuId}")
     @Transactional

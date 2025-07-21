@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Menu } from "@/types";  // 공용 타입 사용
-import { apiFetch } from "@/lib/apiFetch";
-import { toast } from "react-toastify";  // toastify 임포트
+import { Menu } from "@/types";
+import { apiFetch, API_BASE_URL } from "@/lib/apiFetch";
+import { toast } from "react-toastify";
 
 export default function Menus() {
   const router = useRouter();
@@ -20,12 +20,12 @@ export default function Menus() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [stockCount, setStockCount] = useState<number>(0);
-  const [imageUrl, setImageUrl] = useState("");     // ✅ 추가
-  const [imageName, setImageName] = useState("");   // ✅ 추가
+  const [imageName, setImageName] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const fetchMenus = async () => {
     try {
-      const res = await apiFetch("/admin/menus");
+      const res: any = await apiFetch("/admin/menus");
       const data = res.data || res;
 
       const formattedMenus: Menu[] = data.map((menu: any) => ({
@@ -41,7 +41,7 @@ export default function Menus() {
       setMenus(formattedMenus);
     } catch (error) {
       console.error("메뉴 목록 불러오기 실패", error);
-      toast.error("메뉴 데이터를 불러오는 데 실패했습니다.");  // toastify로 에러 표시
+      toast.error("메뉴 데이터를 불러오는 데 실패했습니다.");
     } finally {
       setLoading(false);
     }
@@ -55,47 +55,63 @@ export default function Menus() {
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
+  // 파일 선택 핸들러
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setImageName(file.name);
+    }
+  };
+
   // 메뉴 등록 API 호출
   const handleCreateMenu = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const formData = new FormData();
-      
+
       const menuData = {
         name,
         description,
         price,
         stock_count: stockCount,
-        imageUrl,
-        imageName,
       };
-      
+
       // menu part를 JSON blob으로 추가
       formData.append("menu", new Blob([JSON.stringify(menuData)], {
         type: "application/json"
       }));
 
-      await apiFetch("/admin/addmenu", {
+      // 파일이 선택된 경우 추가
+      if (selectedFile) {
+        formData.append("image", selectedFile);
+      }
+
+      const response: any = await apiFetch("/admin/addmenu", {
         method: "POST",
         body: formData,
       });
 
-      toast.success("메뉴가 등록되었습니다.");  // 성공 메시지
-      
-      // 폼 데이터 초기화
-      setName("");
-      setDescription("");
-      setPrice(0);
-      setStockCount(0);
-      setImageUrl("");
-      setImageName("");
-      
-      closeModal(); // 모달 닫기
-      fetchMenus(); // 등록 후 목록 새로고침
+      if (response.resultCode === "200-OK") {
+        toast.success(response.msg || "메뉴가 등록되었습니다.");
+        
+        // 폼 데이터 초기화
+        setName("");
+        setDescription("");
+        setPrice(0);
+        setStockCount(0);
+        setImageName("");
+        setSelectedFile(null);
+
+        closeModal(); // 모달 닫기
+        fetchMenus(); // 등록 후 목록 새로고침
+      } else {
+        toast.error(response.msg || "메뉴 등록에 실패했습니다.");
+      }
     } catch (error) {
       console.error("메뉴 등록 실패", error);
-      toast.error("메뉴를 등록하는 중 오류가 발생했습니다.");  // 실패 메시지
+      toast.error("메뉴를 등록하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -110,15 +126,15 @@ export default function Menus() {
     if (!confirmed) return;
 
     try {
-      const result = await apiFetch(`/admin/menus/${id}`, {
+      const result: any = await apiFetch(`/admin/menus/${id}`, {
         method: "DELETE",
       });
 
-      toast.success(result.message || "메뉴가 삭제되었습니다.");  // 성공 메시지
+      toast.success(result.msg || "메뉴가 삭제되었습니다.");
       fetchMenus(); // 삭제 후 목록 새로고침
     } catch (error) {
       console.error("메뉴 삭제 실패", error);
-      toast.error("메뉴를 삭제하는 중 오류가 발생했습니다.");  // 실패 메시지
+      toast.error("메뉴를 삭제하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -155,21 +171,24 @@ export default function Menus() {
                 <td className="px-4 py-3 text-left font-medium">{menu.id}</td>
                 <td className="px-4 py-3 text-left">
                   {menu.imageUrl ? (
-                    <img 
-                      src={menu.imageUrl} 
+                    <img
+                      src={`${API_BASE_URL}${menu.imageUrl}`}
                       alt={menu.imageName || menu.name}
                       className="w-12 h-12 object-cover rounded"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling.style.display = 'block';
+                        const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (nextElement) {
+                          nextElement.style.display = 'block';
+                        }
                       }}
                     />
                   ) : null}
-                  <span 
-                    className="text-gray-400 text-sm" 
-                    style={{display: menu.imageUrl ? 'none' : 'block'}}
+                  <span
+                    className="text-gray-400 text-sm"
+                    style={{ display: menu.imageUrl ? 'none' : 'block' }}
                   >
-                    이미지 없음
+                    <img src={`${API_BASE_URL}${menu.imageUrl}`} width={100} height={100} />
                   </span>
                 </td>
                 <td className="px-4 py-3 text-left">{menu.name}</td>
@@ -249,25 +268,19 @@ export default function Menus() {
               </div>
 
               <div>
-                <label className="block font-semibold">이미지 URL</label>
+                <label className="block font-semibold">상품 이미지</label>
                 <input
-                  type="text"
+                  type="file"
+                  name="productImage"
+                  accept="image/*"
+                  onChange={handleFileChange}
                   className="w-full border p-2 rounded"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="/images/latte.jpg"
                 />
-              </div>
-
-              <div>
-                <label className="block font-semibold">이미지 이름</label>
-                <input
-                  type="text"
-                  className="w-full border p-2 rounded"
-                  value={imageName}
-                  onChange={(e) => setImageName(e.target.value)}
-                  placeholder="latte.jpg"
-                />
+                {selectedFile && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    선택된 파일: {selectedFile.name}
+                  </p>
+                )}
               </div>
 
               <div className="flex justify-end space-x-2">
