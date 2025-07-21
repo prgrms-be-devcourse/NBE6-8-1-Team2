@@ -1,0 +1,192 @@
+package com.back.domain.order.order.service;
+
+import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.entity.Role;
+import com.back.domain.member.member.repository.MemberRepository;
+import com.back.domain.menu.menu.dto.MenuResponseDto;
+import com.back.domain.menu.menu.entity.Menu;
+import com.back.domain.menu.menu.repository.MenuRepository;
+import com.back.domain.order.order.dto.*;
+import com.back.domain.order.order.entity.Order;
+import com.back.domain.order.order.entity.OrderMenu;
+import com.back.domain.order.order.repository.OrderRepository;
+import com.back.global.exception.StockShortageException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final MenuRepository menuRepository;
+    private final MemberRepository memberRepository;
+
+    // 메뉴 조회
+    public List<MenuResponseDto> getAllMenus() {
+        return menuRepository.findAll().stream()
+                .map(MenuResponseDto::from)
+                .toList();
+    }
+
+    // 주문 등록
+    public OrderResponseDto createOrder(OrderRequestDto requestDto, Member member) {
+        final Order order = new Order();
+        order.setMember(member);
+
+        int totalPrice = 0;
+
+        // 재고 부족한 메뉴 리스트 수집
+        List<Map<String, Object>> shortages = new ArrayList<>();
+
+        // 모든 메뉴 먼저 조회 + 재고 체크
+        List<OrderMenuRequestDto> items = requestDto.orderItems();
+        List<Menu> menus = new ArrayList<>();
+
+        for (OrderMenuRequestDto menuDto : items) {
+            Menu menu = findMenuById(menuDto.menuId());
+            menus.add(menu);
+
+            if (menu.getStockCount() < menuDto.quantity()) {
+                shortages.add(Map.of(
+                        "name", menu.getName(),
+                        "remaining", menu.getStockCount()
+                ));
+            }
+        }
+
+        // 부족한 게 있으면 예외 발생
+        if (!shortages.isEmpty()) {
+            throw new StockShortageException(shortages);
+        }
+
+        // 부족한 게 없으면 → 재고 차감 + 주문 메뉴 생성
+        for (int i = 0; i < items.size(); i++) {
+            OrderMenuRequestDto menuDto = items.get(i);
+            Menu menu = menus.get(i);
+            int quantity = menuDto.quantity();
+
+            menu.decreaseStock(quantity); // 재고 차감
+            int subtotal = menu.getPrice() * quantity;
+            totalPrice += subtotal;
+
+            OrderMenu orderMenu = new OrderMenu();
+            orderMenu.setOrder(order);
+            orderMenu.setMenu(menu);
+            orderMenu.setQuantity(quantity);
+            order.addOrderMenu(orderMenu);
+        }
+
+        order.setTotalPrice(totalPrice);
+        orderRepository.save(order);
+
+        List<OrderMenuResponseDto> responseMenus = toResponseDtos(order.getOrderItems());
+
+        return new OrderResponseDto(
+                order.getId(),
+                order.getTotalPrice(),
+                order.getCreateDate(),
+                responseMenus,
+                member.getEmail()
+        );
+    }
+
+    // 주문 삭제
+    public void deleteOrder(int orderId, Member member) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        boolean isOwner = order.getMember().getId() == (member.getId());
+        boolean isAdmin = member.getRole() == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new IllegalStateException("주문 삭제는 본인 또는 관리자만 가능합니다.");
+        }
+
+        orderRepository.delete(order);
+    }
+
+    // 내 주문목록(페이징)
+    public Page<OrderResponseDto> getMyOrders(Member member, Pageable pageable) {
+        Page<Order> orders = orderRepository.findByMember(member, pageable);
+
+        return orders.map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
+
+                    return new OrderResponseDto(
+                            order.getId(),
+                            order.getTotalPrice(),
+                            order.getCreateDate(),
+                            menuResponses,
+                            member.getEmail()
+                    );
+                });
+    }
+
+    // 주문 상세 조회
+    public OrderResponseDto getOrderDetailById(int orderId, Member member) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("주문이 존재하지 않습니다."));
+
+        boolean isOwner = order.getMember().getId() == member.getId();
+        boolean isAdmin = member.getRole() == Role.ADMIN;
+        if (!isOwner && !isAdmin) {
+            throw new IllegalStateException("해당 주문을 조회할 권한이 없습니다.");
+        }
+
+        List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
+
+        return new OrderResponseDto(order.getId(), order.getTotalPrice(), order.getCreateDate(), menuResponses, member.getEmail());
+    }
+
+
+    // 전체 주문 목록 조회 (관리자)
+    public Page<AdminOrderResponseDto> adminGetAllOrders(Pageable pageable) {
+        Page<Order> orders = orderRepository.findAll(pageable);
+
+        return orders.map(order -> {
+                    List<OrderMenuResponseDto> menuResponses = toResponseDtos(order.getOrderItems());
+
+                    return new AdminOrderResponseDto(
+                            order.getId(),
+                            order.getMember().getId(),
+                            order.getMember().getEmail(),
+                            order.getCreateDate(),
+                            order.getTotalPrice(),
+                            menuResponses
+                    );
+                });
+    }
+
+    // Member 존재 확인
+    private Member findMemberById(int memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("일치하는 Member를 찾을 수 없습니다."));
+    }
+
+    // Menu 존재 확인
+    private Menu findMenuById(int menuId) {
+        return menuRepository.findById(menuId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 메뉴가 없습니다"));
+    }
+
+
+    // OrderMenuResponseDto 변환
+    private List<OrderMenuResponseDto> toResponseDtos(List<OrderMenu> orderItems) {
+        return orderItems.stream()
+                .map(om -> new OrderMenuResponseDto(
+                        om.getMenu().getId(),
+                        om.getMenu().getName(),
+                        om.getQuantity(),
+                        om.getMenu().getPrice()
+                )).toList();
+    }
+
+}

@@ -1,0 +1,76 @@
+package com.back.domain.member.member.service;
+
+import com.back.domain.member.member.entity.Member;
+import com.back.domain.member.member.repository.MemberRepository;
+import com.back.global.exception.ServiceException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthTokenService authTokenService;
+
+    public Member save(Member member) {
+        return memberRepository.save(member);
+    }
+
+    public Member join(String email, String password, String nickname, String address) {
+        Member member = new Member(email, password, nickname, address);
+        return memberRepository.save(member);
+    }
+
+    public Optional<Member> findById(int id) {
+        return memberRepository.findById(id);
+    }
+
+    public Optional<Member> findByEmail(String email) {
+        return memberRepository.findByEmail(email);
+    }
+
+    public List<Member> findAll() {
+        return memberRepository.findAll();
+    }
+
+    public void deleteById(int id) {
+        memberRepository.deleteById(id);
+    }
+
+    public void checkPassword(Member member, String password) {
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    public String genAccessToken(Member member) {
+        return authTokenService.genAccessToken(member);
+    }
+
+    public String genRefreshToken(Member member) {
+        String refreshToken = authTokenService.genRefreshToken(member);
+        member.updateRefreshToken(refreshToken);
+        return refreshToken;
+    }
+
+    public void clearRefreshToken(Member member) {
+        member.clearRefreshToken();
+    }
+
+    public boolean isValidRefreshToken(String refreshToken) {
+        return authTokenService.isValid(refreshToken);
+    }
+
+    public Map<String, Object> getRefreshTokenPayload(String refreshToken) {
+        return authTokenService.payload(refreshToken);
+    }
+}

@@ -1,27 +1,27 @@
 package com.back.global.initData;
 
+import com.back.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
 public class BaseInitData {
-    @Autowired
-    @Lazy
-    private BaseInitData self;
+    
+    private final ApplicationContext applicationContext;
+    
     @Bean
     ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
-            self.work1();
+            work1();
         };
     }
 
     private void work1() {
-        return;
-    }
 
+    }
 }

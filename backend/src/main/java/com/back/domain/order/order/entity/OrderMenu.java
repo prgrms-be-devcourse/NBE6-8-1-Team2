@@ -1,0 +1,32 @@
+package com.back.domain.order.order.entity;
+
+import com.back.domain.menu.menu.entity.Menu;
+import com.back.global.jpa.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "order_menu")
+public class OrderMenu extends BaseEntity {
+    // 이 주문 메뉴가 속한 주문
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    // 주문한 메뉴의 정보
+    @ManyToOne
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+
+    // 주문한 메뉴의 수량
+    @Column(name = "quantity", nullable = false, columnDefinition = "INT DEFAULT 1")
+    private int quantity;
+
+}
