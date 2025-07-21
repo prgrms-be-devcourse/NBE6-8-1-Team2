@@ -21,7 +21,6 @@ public class OrderMenu extends BaseEntity {
     private Order order;
 
     // 주문한 메뉴의 정보
-    // Menu 구현 후 예정
     @ManyToOne
     @JoinColumn(name = "menu_id")
     private Menu menu;

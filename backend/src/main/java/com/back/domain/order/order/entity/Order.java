@@ -18,9 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "`order`")
 public class Order extends BaseEntity {
-    /*
-    Member관련 구현 후 예정
-     */
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Member member;

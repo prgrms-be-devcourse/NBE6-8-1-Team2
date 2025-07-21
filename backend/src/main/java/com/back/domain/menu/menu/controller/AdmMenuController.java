@@ -71,6 +71,7 @@ public class AdmMenuController {
             return ResponseEntity.ok(RsData.success("메뉴 수정 성공", updatedMenu));
         }
     }
+
     @DeleteMapping("/menus/{menuId}")
     @Transactional
     @Operation(summary = "메뉴 삭제")
@@ -78,6 +79,7 @@ public class AdmMenuController {
         menuService.deleteMenu(menuId);
         return ResponseEntity.ok(RsData.success("메뉴 삭제 성공"));
     }
+
     @GetMapping("/menus/{menuId}")
     @Transactional
     @Operation(summary = "메뉴 단건 조회")
@@ -85,6 +87,7 @@ public class AdmMenuController {
         MenuResponseDto menu = menuService.getMenuById(menuId);
         return ResponseEntity.ok(RsData.success("메뉴 조회 성공", menu));
     }
+
     @GetMapping("/menus")
     @Transactional
     @Operation(summary = "메뉴 전체 조회")
